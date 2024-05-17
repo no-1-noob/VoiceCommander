@@ -1,11 +1,12 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
-using UnityEngine.Windows.Speech;
-using UnityEngine.XR;
 using VoiceCommander.Data;
 using VoiceCommander.Interfaces;
+using VoiceCommander.Recognizer;
+using WebSocketSharp;
 using Zenject;
 
 namespace VoiceCommander.Mgr
@@ -14,87 +15,70 @@ namespace VoiceCommander.Mgr
     {
         [Inject] protected List<IVoiceCommandHandler> lsVoiceCommand = new List<IVoiceCommandHandler>();
 
-        private KeywordRecognizer m_Recognizer;
-        private List<VoiceCommand> lsKeyWordActions;
+        private List<VoiceCommand> lsKeyWordActions = new List<VoiceCommand>();
+        private IRecognizer recognizer;
 
         public void Initialize()
         {
-            Plugin.Log.Error("CoreMgr Initialize");
-            foreach (var device in Microphone.devices)
-            {
-                Plugin.Log.Error("Microphone.devices: " + device);
-            }
-            List<VoiceCommand> lsAllVoiceCommands = new List<VoiceCommand>();
-            foreach (IVoiceCommandHandler voiceCommandPlugin in lsVoiceCommand)
-            {
-                lsAllVoiceCommands.AddRange(voiceCommandPlugin.lsVoicecommand);
-            }
-            CreateRecognizer(lsAllVoiceCommands);
-            Application.focusChanged += Application_focusChanged;
+            SetupAndCheckKeyWords();
+            CreateRecognizer();
         }
 
-        private void Application_focusChanged(bool obj)
+        private void SetupAndCheckKeyWords()
         {
-            Plugin.Log.Error($"Application_focusChanged {obj} Is running? {m_Recognizer?.IsRunning}");
+            foreach (var vcommand in lsVoiceCommand.SelectMany(voiceCommandPlugin => voiceCommandPlugin.lsVoicecommand))
+            {
+                if (lsKeyWordActions.Exists(x => x.Identifier == vcommand.Identifier))
+                {
+                    Plugin.Log.Error($"Voicecommand with Identifier '{vcommand.Identifier}' was not registered as another with the same identifier was already registered");
+                    continue;
+                }
+
+                lsKeyWordActions.Add(vcommand);
+            }
         }
 
         public void Dispose()
         {
             Plugin.Log.Error($"Dispose coreMgr");
-            m_Recognizer.Stop();
-            m_Recognizer.Dispose();
-            m_Recognizer = null;
-            Application.focusChanged -= Application_focusChanged;
+            if(recognizer != null) recognizer.OnKeyWordRecognized -= Recognizer_keyWordRecognized;
+            recognizer?.CloseAndCleanupRecognizer();
         }
 
-        public void CreateRecognizer(List<VoiceCommand> lsKeyWordActions)
+        private void CreateRecognizer()
         {
-            this.lsKeyWordActions = lsKeyWordActions;
-            if (m_Recognizer != null)
-            {
-                m_Recognizer.Stop();
-                m_Recognizer.OnPhraseRecognized -= Recognizer_OnPhraseRecognized;
-            }
-            m_Recognizer = new KeywordRecognizer(lsKeyWordActions.Select(x => x.DefaultKeyword).ToArray());
-            m_Recognizer.OnPhraseRecognized += Recognizer_OnPhraseRecognized;
-            m_Recognizer.Start();
-
-            if (!m_Recognizer.IsRunning)
-            {
-                Plugin.Log.Error("KeywordRecognizer is not running for some reason");
-            }
+            recognizer = new ExternalWebSocketSystemSpeechRecognizer();
+            recognizer.CreateAndStartRecognizer(lsKeyWordActions.Select(x => x.ActualKeyword).ToList());
+            recognizer.OnKeyWordRecognized += Recognizer_keyWordRecognized;
         }
 
-        private void Recognizer_OnPhraseRecognized(PhraseRecognizedEventArgs args)
+        private void Recognizer_keyWordRecognized(object sender, (string keyWord, float confidence) v)
         {
-            Plugin.Log?.Error($"{args.confidence} - {args.text}");
-            VoiceCommand kewwordAction = ParseAction(args);
-            if (kewwordAction.Activate)
+            List<VoiceCommand> lsVoiceCommand = ParseActions(v.keyWord, v.confidence);
+            foreach (var vcommand in lsVoiceCommand)
             {
-                try
+                if (vcommand.Activate)
                 {
-                    kewwordAction.Action.Invoke();
-                }
-                catch (Exception ex)
-                {
-                    Plugin.Log.Error($"Error while activating Action for Keyword '{kewwordAction.Identifier}': {ex.Message}");
+                    try
+                    {
+                        vcommand.Action.Invoke();
+                    }
+                    catch (Exception ex)
+                    {
+                        Plugin.Log.Error($"Error while activating Action for Keyword '{vcommand.Identifier}': {ex.Message}");
+                    }
                 }
             }
         }
 
-        private VoiceCommand ParseAction(PhraseRecognizedEventArgs args)
+        private List<VoiceCommand> ParseActions(string keyword, float confidence)
         {
-            VoiceCommand keywordAction = new VoiceCommand();
-            VoiceCommand keywordActionSettings = lsKeyWordActions.Find(x => x.DefaultKeyword == args.text);
-            if (keywordActionSettings != null)
+            List<VoiceCommand> lsVoiceCommand = lsKeyWordActions.Where(x => x.DefaultKeyword.ToLower() == keyword.ToLower()).ToList();
+            foreach (VoiceCommand voiceCommand in lsVoiceCommand)
             {
-                keywordAction.Identifier = keywordActionSettings.Identifier;
-                keywordAction.DefaultKeyword = keywordActionSettings.DefaultKeyword;
-                keywordAction.ConfidenceLevel = args.confidence;
-                keywordAction.Activate = keywordAction.ConfidenceLevel >= args.confidence;
-                keywordAction.Action = keywordActionSettings.Action; ;
+                voiceCommand.Activate = confidence >= voiceCommand.ConfidenceLevel;
             }
-            return keywordAction;
+            return lsVoiceCommand;
         }
     }
 }

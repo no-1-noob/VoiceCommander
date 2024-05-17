@@ -1,9 +1,14 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 16
-VisualStudioVersion = 16.0.32510.428
+# Visual Studio Version 17
+VisualStudioVersion = 17.4.33213.308
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VoiceCommander", "VoiceCommander\VoiceCommander.csproj", "{2A03DB8D-F001-41E6-ADDE-5434A5CF908D}"
+	ProjectSection(ProjectDependencies) = postProject
+		{7596483B-4061-4BC3-BF9A-617B84DA6971} = {7596483B-4061-4BC3-BF9A-617B84DA6971}
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VoiceCommandRecognizer", "VoiceCommandRecognizer\VoiceCommandRecognizer.csproj", "{7596483B-4061-4BC3-BF9A-617B84DA6971}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,6 +20,10 @@ Global
 		{2A03DB8D-F001-41E6-ADDE-5434A5CF908D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{2A03DB8D-F001-41E6-ADDE-5434A5CF908D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{2A03DB8D-F001-41E6-ADDE-5434A5CF908D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7596483B-4061-4BC3-BF9A-617B84DA6971}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7596483B-4061-4BC3-BF9A-617B84DA6971}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7596483B-4061-4BC3-BF9A-617B84DA6971}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7596483B-4061-4BC3-BF9A-617B84DA6971}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

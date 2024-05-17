@@ -46,9 +46,6 @@ namespace VoiceCommander
                                 Plugin.Log.Error($"No voice commands found for {voiceCommand.Name}. Make sure the List of commands is filled when calling the standard constructor");
                                 continue;
                             }
-                            //TODO:
-                            //Check if Identifier is unique
-                            //Check if Keywords are unique
                         }
                         catch (Exception ex)
                         {
