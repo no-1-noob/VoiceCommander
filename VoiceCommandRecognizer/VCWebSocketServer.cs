@@ -53,9 +53,6 @@ namespace VoiceCommandRecognizer
                 {
                     Program.Log($"Add to SpeechRecognitionEngine: {keyword}", Program.MsgType.DEBUG);
                     GrammarBuilder builder = new GrammarBuilder(keyword);
-                    Choices personChoice = new Choices(new string[] { "1", "2", "3", "4" });
-                    builder.Append(personChoice);
-                    builder.AppendWildcard();
                     Grammar g = new Grammar(builder);
                     listener.LoadGrammar(g);
                 }

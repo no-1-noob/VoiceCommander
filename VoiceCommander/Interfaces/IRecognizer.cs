@@ -3,11 +3,23 @@ using System.Collections.Generic;
 
 namespace VoiceCommander.Interfaces
 {
+    /// <summary>
+    /// Interface for VoiceRecognizer
+    /// </summary>
     internal interface IRecognizer
     {
+        /// <summary>
+        /// Start voice recognition with the given keywords
+        /// </summary>
+        /// <param name="lsKeywords"></param>
         void CreateAndStartRecognizer(List<string> lsKeywords);
+        /// <summary>
+        /// Stop voice recognition and clean up everything relating to it
+        /// </summary>
         void CloseAndCleanupRecognizer();
-
-        event EventHandler<(string, float)> OnKeyWordRecognized;
+        /// <summary>
+        /// Notify when a keyword has been recognized (Keyword, confidence [0->1])
+        /// </summary>
+        event EventHandler<(string keyword, float confidence)> OnKeyWordRecognized;
     }
 }

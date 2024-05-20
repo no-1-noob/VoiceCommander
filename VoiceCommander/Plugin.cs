@@ -1,10 +1,17 @@
-﻿using IPA;
+﻿using BeatSaberMarkupLanguage;
+using BeatSaberMarkupLanguage.MenuButtons;
+using HMUI;
+using IPA;
+using IPA.Config.Stores;
+using IPA.Utilities;
 using SiraUtil.Zenject;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using VoiceCommander.Configuration;
 using VoiceCommander.Installers;
+using VoiceCommander.UI;
 using IPALogger = IPA.Logging.Logger;
 
 namespace VoiceCommander
@@ -17,6 +24,8 @@ namespace VoiceCommander
 
         internal static List<VoiceCommandSettings> AvailableVoiceCommandSettings = new List<VoiceCommandSettings>();
 
+        internal static FlowCoordinator ParentFlow { get; private set; }
+        private static VoiceCommanderFlowCoordinator _flow;
         static Process _webSocketVoiceCommandRecognizerProcess;
 
         [Init]
@@ -25,20 +34,29 @@ namespace VoiceCommander
         /// [Init] methods that use a Constructor or called before regular methods like InitWithConfig.
         /// Only use [Init] with one Constructor.
         /// </summary>
-        public void Init(IPALogger logger, Zenjector zenjector)
+        public void Init(IPALogger logger, Zenjector zenjector, IPA.Config.Config conf)
         {
             Instance = this;
             Log = logger;
-            Log.Info("VoiceCommander initialized.");
+            Log.Info($"VoiceCommander initialized. with config {conf}");
+
+            if(conf != null)
+            {
+                PluginConfig.Instance = conf.Generated<Configuration.PluginConfig>();
+                PluginConfig.Instance.Changed();
+            }
+
+            MenuButtons.instance.RegisterButton(new MenuButton("VoiceCommander", "Controll stuff with your voice", ShowSettingsFlow, true));
             foreach (Location location in (Location[])Enum.GetValues(typeof(Location)))
             {
                 Log.Error($"Installing to {location}");
                 zenjector.Install<VoiceCommandInstaller>(location, location);
             }
+            zenjector.Install<VoiceCommandSettingsInstaller>(Location.App);
 
             try
             {
-                string path = "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Beat Saber Dev\\1_29\\Plugins\\VCR\\VoiceCommandRecognizer.exe";
+                string path = Path.Combine(UnityGame.PluginsPath, "VCR\\VoiceCommandRecognizer.exe");
                 if (File.Exists(path))
                 {
                     _webSocketVoiceCommandRecognizerProcess = new Process();
@@ -57,18 +75,6 @@ namespace VoiceCommander
             }
         }
 
-        #region BSIPA Config
-        //Uncomment to use BSIPA's config
-        /*
-        [Init]
-        public void InitWithConfig(Config conf)
-        {
-            Configuration.PluginConfig.Instance = conf.Generated<Configuration.PluginConfig>();
-            Log.Debug("Config loaded");
-        }
-        */
-        #endregion
-
         [OnStart]
         public void OnApplicationStart()
         {
@@ -79,14 +85,31 @@ namespace VoiceCommander
         [OnExit]
         public void OnApplicationQuit()
         {
-            Log.Error($"OnApplicationQuit {_webSocketVoiceCommandRecognizerProcess}");
-            //Fcukking kill the voice recognition when closing BS
-            foreach (var voiceCommandRecognizerProcess in Process.GetProcessesByName("VoiceCommandRecognizer"))
+            try
             {
-                voiceCommandRecognizerProcess.Kill();
+                //Fcukking kill the voice recognition when closing BS
+                foreach (var voiceCommandRecognizerProcess in Process.GetProcessesByName("VoiceCommandRecognizer"))
+                {
+                    voiceCommandRecognizerProcess.Kill();
+                }
+                _webSocketVoiceCommandRecognizerProcess?.CloseMainWindow();
+                _webSocketVoiceCommandRecognizerProcess.WaitForExit();
             }
-            _webSocketVoiceCommandRecognizerProcess?.CloseMainWindow();
-            _webSocketVoiceCommandRecognizerProcess.WaitForExit();
+            catch (Exception ex)
+            {
+                Log.Error($"OnApplicationQuit Error {ex.Message}");
+                throw;
+            }
+        }
+
+        private static void ShowSettingsFlow()
+        {
+            if (_flow == null)
+                _flow = BeatSaberUI.CreateFlowCoordinator<VoiceCommanderFlowCoordinator>();
+
+            ParentFlow = BeatSaberUI.MainFlowCoordinator.YoungestChildFlowCoordinatorOrSelf();
+
+            BeatSaberUI.PresentFlowCoordinator(ParentFlow, _flow, immediately: true);
         }
     }
 }

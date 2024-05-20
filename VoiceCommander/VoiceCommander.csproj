@@ -42,6 +42,9 @@
     <DisableZipRelease>True</DisableZipRelease>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="BSML">
+      <HintPath>$(BeatSaberDir)\Plugins\BSML.dll</HintPath>
+    </Reference>
     <Reference Include="BS_Utils">
       <HintPath>$(BeatSaberDir)\Plugins\BS_Utils.dll</HintPath>
     </Reference>
@@ -119,12 +122,19 @@
   <ItemGroup>
     <Compile Include="Data\VoiceCommand.cs" />
     <Compile Include="Installers\VoiceCommandInstaller.cs" />
+    <Compile Include="Installers\VoiceCommandSettingsInstaller.cs" />
     <Compile Include="Interfaces\IRecognizer.cs" />
     <Compile Include="Interfaces\IVoiceCommandHandler.cs" />
     <Compile Include="Mgr\CoreMgr.cs" />
+    <Compile Include="Mgr\VoiceCommandSettingsMgr.cs" />
     <Compile Include="Plugin.cs" />
     <Compile Include="Configuration\PluginConfig.cs" />
     <Compile Include="Recognizer\ExternalWebSocketSystemSpeechRecognizer.cs" />
+    <Compile Include="UI\ViewController\SettingsLeftViewController.cs" />
+    <Compile Include="UI\ViewController\SettingsMidViewController.cs" />
+    <Compile Include="UI\ViewController\SettingsRightViewController.cs" />
+    <Compile Include="Utils\Enum.cs" />
+    <Compile Include="Utils\Utils.cs" />
     <Compile Include="VoiceCommandSettings.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="VoiceCommandFeature.cs" />
@@ -135,6 +145,11 @@
   <ItemGroup>
     <None Include="Directory.Build.props" Condition="Exists('Directory.Build.props')" />
     <None Include="Directory.Build.targets" />
+    <Compile Include="UI\VoiceCommanderFlowCoordinator.cs" />
+    <EmbeddedResource Include="UI\View\SettingsLeftView.bsml" />
+    <EmbeddedResource Include="UI\View\SettingsMidView.bsml" />
+    <EmbeddedResource Include="UI\View\SettingsRightView.bsml" />
+    <None Include="README.md" />
     <None Include="VoiceCommander.csproj.user" Condition="Exists('VoiceCommander.csproj.user')" />
   </ItemGroup>
   <ItemGroup>
@@ -144,5 +159,6 @@
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

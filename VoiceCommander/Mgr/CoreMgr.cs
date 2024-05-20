@@ -1,12 +1,9 @@
-﻿using Newtonsoft.Json;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using UnityEngine;
 using VoiceCommander.Data;
 using VoiceCommander.Interfaces;
 using VoiceCommander.Recognizer;
-using WebSocketSharp;
 using Zenject;
 
 namespace VoiceCommander.Mgr
@@ -28,12 +25,6 @@ namespace VoiceCommander.Mgr
         {
             foreach (var vcommand in lsVoiceCommand.SelectMany(voiceCommandPlugin => voiceCommandPlugin.lsVoicecommand))
             {
-                if (lsKeyWordActions.Exists(x => x.Identifier == vcommand.Identifier))
-                {
-                    Plugin.Log.Error($"Voicecommand with Identifier '{vcommand.Identifier}' was not registered as another with the same identifier was already registered");
-                    continue;
-                }
-
                 lsKeyWordActions.Add(vcommand);
             }
         }
@@ -47,9 +38,7 @@ namespace VoiceCommander.Mgr
 
         private void CreateRecognizer()
         {
-            recognizer = new ExternalWebSocketSystemSpeechRecognizer();
-            recognizer.CreateAndStartRecognizer(lsKeyWordActions.Select(x => x.ActualKeyword).ToList());
-            recognizer.OnKeyWordRecognized += Recognizer_keyWordRecognized;
+            recognizer = Utils.Utils.CreateRecognizer(lsKeyWordActions, Recognizer_keyWordRecognized);
         }
 
         private void Recognizer_keyWordRecognized(object sender, (string keyWord, float confidence) v)
@@ -76,7 +65,7 @@ namespace VoiceCommander.Mgr
             List<VoiceCommand> lsVoiceCommand = lsKeyWordActions.Where(x => x.DefaultKeyword.ToLower() == keyword.ToLower()).ToList();
             foreach (VoiceCommand voiceCommand in lsVoiceCommand)
             {
-                voiceCommand.Activate = confidence >= voiceCommand.ConfidenceLevel;
+                voiceCommand.Activate = confidence >= voiceCommand.ActualConfidenceLevel;
             }
             return lsVoiceCommand;
         }

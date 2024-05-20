@@ -1,6 +1,9 @@
-﻿/*
+﻿
+using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using IPA.Config.Stores;
+using Newtonsoft.Json;
+using VoiceCommander.Data;
 
 [assembly: InternalsVisibleTo(GeneratedStore.AssemblyVisibilityTarget)]
 namespace VoiceCommander.Configuration
@@ -8,7 +11,11 @@ namespace VoiceCommander.Configuration
     internal class PluginConfig
     {
         public static PluginConfig Instance { get; set; }
-        public virtual int IntValue { get; set; } = 42; // Must be 'virtual' if you want BSIPA to detect a value change and save the config automatically.
+
+        //For some reason lists are not serialized automatically so use this hack for now
+        public virtual string customKeywords { get; set; } = string.Empty;
+
+        private List<VoiceCommand> lsVoiceCommandSettings = new List<VoiceCommand>();
 
         /// <summary>
         /// This is called whenever BSIPA reads the config from disk (including when file changes are detected).
@@ -16,6 +23,11 @@ namespace VoiceCommander.Configuration
         public virtual void OnReload()
         {
             // Do stuff after config is read from disk.
+            if (string.IsNullOrEmpty(customKeywords))
+            {
+                customKeywords = JsonConvert.SerializeObject(new List<VoiceCommand>());
+            }
+            lsVoiceCommandSettings = JsonConvert.DeserializeObject<List<VoiceCommand>>(customKeywords);
         }
 
         /// <summary>
@@ -33,6 +45,39 @@ namespace VoiceCommander.Configuration
         {
             // This instance's members populated from other
         }
+
+        internal void UpdateKeyWord(VoiceCommand command)
+        {
+            var existingVoiceCommandSetting = lsVoiceCommandSettings.Find(x => x.Identifier == command.Identifier);
+            if (existingVoiceCommandSetting == null)
+            {
+                lsVoiceCommandSettings.Add(command);
+            }
+            else
+            {
+                existingVoiceCommandSetting.ApplySavedCustomKeywordSettings(command);
+            }
+            customKeywords = JsonConvert.SerializeObject(lsVoiceCommandSettings);
+        }
+
+        internal void ResetKeyWord(VoiceCommand command)
+        {
+            command.ResetCustomSettings();
+            var existingVoiceCommandSetting = lsVoiceCommandSettings.Find(x => x.Identifier == command.Identifier);
+            if (existingVoiceCommandSetting != null)
+            {
+                existingVoiceCommandSetting.ResetCustomSettings();
+            }
+            customKeywords = JsonConvert.SerializeObject(lsVoiceCommandSettings);
+        }
+
+        internal void ApplySettingsToVoiceCommand(VoiceCommand command)
+        {
+            VoiceCommand existingVoiceCommandSetting = lsVoiceCommandSettings.Find(x => x.Identifier == command.Identifier);
+            if(existingVoiceCommandSetting != null)
+            {
+                command.ApplySavedCustomKeywordSettings(existingVoiceCommandSetting);
+            }
+        }
     }
 }
-*/
