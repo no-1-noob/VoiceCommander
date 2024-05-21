@@ -17,7 +17,7 @@ using IPALogger = IPA.Logging.Logger;
 namespace VoiceCommander
 {
     [Plugin(RuntimeOptions.SingleStartInit)]
-    public class Plugin
+    internal class Plugin
     {
         internal static Plugin Instance { get; private set; }
         internal static IPALogger Log { get; private set; }
@@ -28,12 +28,15 @@ namespace VoiceCommander
         private static VoiceCommanderFlowCoordinator _flow;
         static Process _webSocketVoiceCommandRecognizerProcess;
 
-        [Init]
         /// <summary>
         /// Called when the plugin is first loaded by IPA (either when the game starts or when the plugin is enabled if it starts disabled).
         /// [Init] methods that use a Constructor or called before regular methods like InitWithConfig.
         /// Only use [Init] with one Constructor.
         /// </summary>
+        /// <param name="logger"></param>
+        /// <param name="zenjector"></param>
+        /// <param name="conf"></param>
+        [Init]
         public void Init(IPALogger logger, Zenjector zenjector, IPA.Config.Config conf)
         {
             Instance = this;

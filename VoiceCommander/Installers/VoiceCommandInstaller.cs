@@ -12,7 +12,7 @@ namespace VoiceCommander.Installers
 
         public VoiceCommandInstaller(Location intallLocation)
         {
-            this.voiceCommandsToInstall = Plugin.AvailableVoiceCommandSettings.Where(x => x.ZenjectLocationEnum == intallLocation).ToList();
+            this.voiceCommandsToInstall = Plugin.AvailableVoiceCommandSettings.Where(x => (x.ZenjectLocationEnum.HasFlag(intallLocation))).ToList();
         }
         public override void InstallBindings()
         {

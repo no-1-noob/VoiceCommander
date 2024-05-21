@@ -1,14 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using IPA.Loader;
 using IPA.Loader.Features;
 using Newtonsoft.Json.Linq;
+using SiraUtil.Zenject;
 using VoiceCommander.Interfaces;
 
 namespace VoiceCommander
 {
-    public class VoiceCommandFeature : Feature
+    internal class VoiceCommandFeature : Feature
     {
         private Dictionary<PluginMetadata, List<VoiceCommandSettings>> voiceCommandsToLoad = new Dictionary<PluginMetadata, List<VoiceCommandSettings>>();
 
@@ -53,14 +55,33 @@ namespace VoiceCommander
                             continue;
                         }
 
-                        if (Enum.TryParse(voiceCommand.ZenjectLocation, out voiceCommand.ZenjectLocationEnum))
+                        Location parsedLocation = Location.None;
+                        if (!Enum.TryParse(voiceCommand.ZenjectLocation, out parsedLocation))
                         {
-                            Plugin.AvailableVoiceCommandSettings.Add(voiceCommand);
-                            Plugin.Log.Notice($"Loaded VoiceCommands for Plugin {voiceCommand.Name}");
+                            //Check using bitflag
+                            if (voiceCommand.ZenjectLocation.Length > 2 && Int32.TryParse(voiceCommand.ZenjectLocation.Substring(2), NumberStyles.HexNumber, NumberFormatInfo.CurrentInfo, out int zenjectLocationBitMask))
+                            {
+                                Location allLocations = Location.None;
+                                foreach (Location location in (Location[])Enum.GetValues(typeof(Location)))
+                                {
+                                    allLocations |= location;
+                                }
+                                if(!allLocations.HasFlag((Location)zenjectLocationBitMask)){
+                                    Plugin.Log.Error($"Failed to load a Type from the provided CommandLoacation for {voiceCommand.Name}. {voiceCommand.ZenjectLocation} is not a valid bitmask for Zenject Location");
+                                    continue;
+                                }
+                                parsedLocation = (Location)zenjectLocationBitMask;
+                            }
+                        }
+                        if(parsedLocation == Location.None)
+                        {
+                            Plugin.Log.Error($"Failed to parse ZenjectLocation for {voiceCommand.Name}.");
                         }
                         else
                         {
-                            Plugin.Log.Error($"Failed to parse ZenjectLocation for {voiceCommand.Name}.");
+                            Plugin.Log.Notice($"Loaded VoiceCommands for Plugin {voiceCommand.Name} Zenject location: {parsedLocation}");
+                            voiceCommand.ZenjectLocationEnum = parsedLocation;
+                            Plugin.AvailableVoiceCommandSettings.Add(voiceCommand);
                         }
                     }
                     else

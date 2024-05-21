@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Diagnostics;
 using System.Runtime.InteropServices;
 
 namespace VoiceCommandRecognizer
@@ -13,7 +12,6 @@ namespace VoiceCommandRecognizer
 
         static ConsoleEventDelegate handler;
         public static VCWebSocketServer VCWebSocketServer;
-        static Process myProcess;
 
         static void Main(string[] args)
         {
@@ -34,7 +32,6 @@ namespace VoiceCommandRecognizer
         {
             if (eventType == 2)
             {
-                myProcess?.CloseMainWindow();
                 VCWebSocketServer?.CloseSocket();
             }
             Log("ConsoleEventCallback", MsgType.INFO);
