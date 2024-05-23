@@ -80,8 +80,6 @@ namespace VoiceCommander
         [OnStart]
         public void OnApplicationStart()
         {
-            Log.Debug("OnApplicationStart");
-
         }
 
         [OnExit]
