@@ -123,11 +123,9 @@
   <ItemGroup>
     <Compile Include="Data\VoiceCommand.cs" />
     <Compile Include="Installers\VoiceCommandInstaller.cs" />
-    <Compile Include="Installers\VoiceCommandSettingsInstaller.cs" />
     <Compile Include="Interfaces\IRecognizer.cs" />
     <Compile Include="Interfaces\IVoiceCommandHandler.cs" />
     <Compile Include="Mgr\CoreMgr.cs" />
-    <Compile Include="Mgr\VoiceCommandSettingsMgr.cs" />
     <Compile Include="Plugin.cs" />
     <Compile Include="Configuration\PluginConfig.cs" />
     <Compile Include="Recognizer\ExternalWebSocketSystemSpeechRecognizer.cs" />

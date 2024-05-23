@@ -9,13 +9,15 @@ namespace VoiceCommander.Recognizer
     internal class ExternalWebSocketSystemSpeechRecognizer : IRecognizer
     {
         private WebSocket webSocket;
-        private string url = "ws://localhost:9898/socket";
+        private string url = "ws://localhost:{0}/socket";
         private List<string> _lsKeywords = new List<string>();
+        private bool _isPaused = false;
 
         public event EventHandler<(string, float)> OnKeyWordRecognized;
 
         public void CreateAndStartRecognizer(List<string> lsKeywords)
         {
+            url = String.Format(url, Configuration.PluginConfig.Instance.Port);
             _lsKeywords = lsKeywords;
             webSocket = new WebSocket(url);
             webSocket.OnMessage += WebSocket_OnMessage;
@@ -35,6 +37,50 @@ namespace VoiceCommander.Recognizer
             webSocket.OnMessage -= WebSocket_OnMessage;
             webSocket.OnError -= WebSocket_OnError;
             webSocket.CloseAsync();
+        }
+
+        public void ResetRecognizer(List<string> lsKeywords)
+        {
+            if (webSocket.IsAlive && !_isPaused)
+            {
+                RemoveCurrentKeywords();
+                _lsKeywords = lsKeywords;
+                AddKeywords(_lsKeywords);
+            }
+            else
+            {
+                _lsKeywords = lsKeywords;
+            }
+        }
+
+        private void AddKeywords(List<string> lsKeywords)
+        {
+            if (webSocket.IsAlive)
+            {
+                VoiceCommandMessage messageAdd = new VoiceCommandMessage { type = VCType.ADD, lsCommands = _lsKeywords };
+                webSocket.Send(JsonConvert.SerializeObject(messageAdd));
+            }
+        }
+
+        private void RemoveCurrentKeywords()
+        {
+            if (webSocket.IsAlive)
+            {
+                VoiceCommandMessage messageRemove = new VoiceCommandMessage { type = VCType.REMOVE, lsCommands = _lsKeywords };
+                webSocket.Send(JsonConvert.SerializeObject(messageRemove));
+            }
+        }
+
+        public void Start()
+        {
+            _isPaused = false;
+            AddKeywords(_lsKeywords);
+        }
+
+        public void Pause()
+        {
+            _isPaused = true;
+            RemoveCurrentKeywords();
         }
 
         private void WebSocket_OnOpen(object sender, EventArgs e)

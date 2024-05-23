@@ -14,6 +14,19 @@ namespace VoiceCommander.Interfaces
         /// <param name="lsKeywords"></param>
         void CreateAndStartRecognizer(List<string> lsKeywords);
         /// <summary>
+        /// Remove all old Keywords and add the new ones
+        /// </summary>
+        /// <param name="lsKeywords"></param>
+        void ResetRecognizer(List<string> lsKeywords);
+        /// <summary>
+        /// Restart the recognition with the previously given keywords
+        /// </summary>
+        void Start();
+        /// <summary>
+        /// Pausing the recognition but keep all other infos
+        /// </summary>
+        void Pause();
+        /// <summary>
         /// Stop voice recognition and clean up everything relating to it
         /// </summary>
         void CloseAndCleanupRecognizer();

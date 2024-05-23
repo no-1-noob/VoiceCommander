@@ -12,6 +12,8 @@ namespace VoiceCommander.Configuration
     {
         public static PluginConfig Instance { get; set; }
 
+        public virtual int Port { get; set; } = Utils.Utils.DefaultPort;
+
         //For some reason lists are not serialized automatically so use this hack for now
         public virtual string customKeywords { get; set; } = string.Empty;
 

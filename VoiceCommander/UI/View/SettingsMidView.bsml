@@ -1,3 +1,13 @@
-﻿<scrollable-settings-container xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xsi:schemaLocation='https://monkeymanboy.github.io/BSML-Docs/ https://raw.githubusercontent.com/monkeymanboy/BSML-Docs/gh-pages/BSMLSchema.xsd'>
-	<text text='MidView' italics='true' align='Center' font-size='4' />
+﻿<scrollable-settings-container>
+  <vertical vertical-fit='PreferredSize' preferred-width='100' child-align='MiddleCenter' xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xsi:schemaLocation='https://monkeymanboy.github.io/BSML-Docs/ https://raw.githubusercontent.com/monkeymanboy/BSML-Docs/gh-pages/BSMLSchema.xsd'>
+    <dropdown-list-setting id='dropdown-mods' text='Mod' value='current-mod' choices='all-mod-options' apply-on-change='true' bind-value='true'/>
+    <dropdown-list-setting id='dropdown-commands' text='Voice Command' value='current-command' choices='all-command-options' apply-on-change='true' bind-value='true'/>
+    <text text='- - - - - -'></text>
+    <string-setting text='Keyword' value='current-command-keyword' bind-value='true' apply-on-change='true'></string-setting>
+    <slider-setting text='Confidence' value='current-command-confidence' hover-hint='How confident has the voice recognition to be to trigger the action.' min='0' max='1' increment='0.01' bind-value='true' apply-on-change='true' integer-only='false'/>
+    <horizontal>
+      <button text='Save' on-click='click-save'/>
+      <button text='Reset' on-click='click-reset'/>
+    </horizontal>
+  </vertical>
 </scrollable-settings-container>

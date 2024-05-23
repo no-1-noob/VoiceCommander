@@ -1,6 +1,7 @@
 ﻿using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.Linq;
 using System.Speech.Recognition;
 using System.Text;
@@ -12,13 +13,15 @@ namespace VoiceCommandRecognizer
 {
     internal class VCWebSocketServer : IDisposable
     {
-        private string _serverUrl = "ws://localhost:9898";
+        private string _serverUrl = "ws://localhost:";
         private WebSocketServer _server;
         private List<string> _keywords = new List<string>();
         private SpeechRecognitionEngine listener;
 
         public VCWebSocketServer()
         {
+            string port = ConfigurationManager.AppSettings["port"];
+            _serverUrl += port;
             StartSocket();
         }
 
