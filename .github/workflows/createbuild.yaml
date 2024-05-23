@@ -39,7 +39,7 @@ jobs:
                   BUILDTEXT: Filename=${{ steps.Build.outputs.filename }}
                   ASSEMBLYNAME: AssemblyName=${{ steps.Build.outputs.assemblyname }}
             - name: Upload Artifact
-              uses: actions/upload-artifact@v1
+              uses: actions/upload-artifact@v4
               with:
                   name: ${{ steps.Build.outputs.filename }}.zip
                   path: ${{ steps.Build.outputs.artifactpath }}
@@ -47,6 +47,6 @@ jobs:
               uses: softprops/action-gh-release@v1
               if: startsWith(github.ref, 'refs/tags/')
               with:
-                  files: ./${{ steps.Build.outputs.filename }}.zip
+                  files: ${{ steps.Build.outputs.filename }}.zip
               env:
                   GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
