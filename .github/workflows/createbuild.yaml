@@ -46,10 +46,11 @@ jobs:
                   Write-Output ("$key=$value") >> $env:GITHUB_OUTPUT
                 }
             - name: Echo Filename
-              run: echo $BUILDTEXT $ASSEMBLYNAME
+              run: echo $BUILDTEXT $ASSEMBLYNAME $ARTIFACTPATH
               env:
                   BUILDTEXT: Filename=${{ env.filename }}
                   ASSEMBLYNAME: AssemblyName=${{ env.assemblyname }}
+                  ARTIFACTPATH: ArtifactPath=${{ env.artifactpath }}
             - name: Upload Artifact
               uses: actions/upload-artifact@v4
               with:

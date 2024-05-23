@@ -54,7 +54,7 @@
     <Message Text="PluginVersion: $(PluginVersion), AssemblyVersion: $(AssemblyVersion), GameVersion: $(GameVersion)" Importance="high"/>
     <WriteLinesToFile
       File="$(OutputFile)"
-      Lines="filename=$(ArtifactName).zip;assemblyname=$(AssemblyName);assemblyname=$(ProjectDir)$(ArtifactDestination)"
+      Lines="filename=$(ArtifactName).zip;assemblyname=$(AssemblyName);artifactpath=$(ProjectDir)$(ArtifactDestination)"
       Overwrite="true" />
     <Message Text="Copying '$(OutputAssemblyName).dll' to '$(ProjectDir)$(ArtifactDestination)\Plugins\$(AssemblyName).dll'" Importance="high"/>
     <ItemGroup>
