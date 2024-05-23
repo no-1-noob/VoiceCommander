@@ -39,6 +39,12 @@ namespace VoiceCommander
         [Init]
         public void Init(IPALogger logger, Zenjector zenjector, IPA.Config.Config conf)
         {
+#if DEBUG
+            Plugin.Log.Error("!!! This is still DEBUGG !!!");
+            Plugin.Log.Error("!!! This is still DEBUGG !!!");
+            Plugin.Log.Error("!!! This is still DEBUGG !!!");
+#endif
+
             Instance = this;
             Log = logger;
             Log.Info($"VoiceCommander initialized. with config {conf}");

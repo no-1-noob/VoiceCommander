@@ -41,7 +41,7 @@ jobs:
             - name: Upload Artifact
               uses: actions/upload-artifact@v1
               with:
-                  name: ${{ steps.Build.outputs.filename }}
+                  name: ${{ steps.Build.outputs.filename }}.zip
                   path: ${{ steps.Build.outputs.artifactpath }}
             - name: Release
               uses: softprops/action-gh-release@v1
