@@ -33,20 +33,26 @@ jobs:
               run: msbuild ${{ github.workspace }}/VoiceCommander.sln /property:Configuration=Release
             - name: GitStatus
               run: git status
+            - name: Export environment variables
+              id: export-vars
+              run: |
+                echo "filename=$(printenv filename)" >> $GITHUB_ENV
+                echo "assemblyname=$(printenv assemblyname)" >> $GITHUB_ENV
+                echo "artifactpath=$(printenv artifactpath)" >> $GITHUB_ENV
             - name: Echo Filename
               run: echo $BUILDTEXT $ASSEMBLYNAME
               env:
-                  BUILDTEXT: Filename=${{ steps.Build.outputs.filename }}
-                  ASSEMBLYNAME: AssemblyName=${{ steps.Build.outputs.assemblyname }}
+                  BUILDTEXT: Filename=${{ env.filename }}
+                  ASSEMBLYNAME: AssemblyName=${{ env.assemblyname }}
             - name: Upload Artifact
               uses: actions/upload-artifact@v4
               with:
-                  name: ${{ steps.Build.outputs.filename }}.zip
-                  path: ${{ steps.Build.outputs.artifactpath }}
+                  name: ${{ env.filename }}.zip
+                  path: ${{ env.artifactpath }}
             - name: Release
               uses: softprops/action-gh-release@v1
               if: startsWith(github.ref, 'refs/tags/')
               with:
-                  files: ${{ steps.Build.outputs.filename }}.zip
+                  files: ${{ env.filename }}.zip
               env:
                   GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
