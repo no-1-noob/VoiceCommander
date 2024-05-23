@@ -34,7 +34,7 @@ jobs:
             - name: GitStatus
               run: git status
             - name: Echo Filename
-              run: echo $BUILDTEXT \($ASSEMBLYNAME\)
+              run: echo $BUILDTEXT $ASSEMBLYNAME
               env:
                   BUILDTEXT: Filename=${{ steps.Build.outputs.filename }}
                   ASSEMBLYNAME: AssemblyName=${{ steps.Build.outputs.assemblyname }}
