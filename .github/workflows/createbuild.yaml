@@ -1,0 +1,51 @@
+name: CreateRelease
+
+on: 
+    push:
+        branches: '*'
+        tags: v*
+    pull_request:
+        branches: [ master ]
+        
+jobs:
+    Build_SetupCI:
+        runs-on: ubuntu-latest
+        outputs:
+          artifactName: ${{ steps.outPutName.outputs.Name }}
+          artifactPath: ${{ steps.outPutPath.outputs.Path }}
+        steps:
+            - uses: actions/checkout@v3
+              with:
+                  ref: 'SetupCI'
+            - name: Setup dotnet
+              uses: actions/setup-dotnet@v3
+              with:
+                  dotnet-version: 7.0.110
+            - name: Initialize modding environment
+              uses: beat-forge/init-beatsaber@v1.1.0
+              with:
+                  token: ${{ github.token }}
+                  version: 1.29.1
+            - name: Download Mod Dependencies
+              uses: Goobwabber/download-beatmods-deps@1.2
+              with:
+                  manifest: ${{ github.workspace }}/manifest.json
+            - name: Build
+              id: Build
+              run: dotnet build --configuration Release
+            - name: GitStatus
+              run: git status
+            - name: Echo Filename
+              run: echo $BUILDTEXT \($ASSEMBLYNAME\)
+              env:
+                  BUILDTEXT: Filename=${{ steps.Build.outputs.filename }}
+                  ASSEMBLYNAME: AssemblyName=${{ steps.Build.outputs.assemblyname }}
+            - name: Upload Artifact
+              uses: actions/upload-artifact@v1
+              with:
+                  name: ${{ steps.Build.outputs.filename }}
+                  path: ${{ steps.Build.outputs.artifactpath }}
+            - id: outPutName
+              run: echo "Name=${{ steps.Build.outputs.filename }}" >> "$GITHUB_OUTPUT"
+            - id: outPutPath
+              run: echo "Path=${{ steps.Build.outputs.artifactpath }}" >> "$GITHUB_OUTPUT"
