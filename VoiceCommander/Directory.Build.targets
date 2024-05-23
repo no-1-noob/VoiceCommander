@@ -51,9 +51,9 @@
     </PropertyGroup>
     <Message Text="Building for CI" Importance="high"/>
     <Message Text="PluginVersion: $(PluginVersion), AssemblyVersion: $(AssemblyVersion), GameVersion: $(GameVersion)" Importance="high"/>
-    <Exec Command="'filename=$(ArtifactName)' >> $GITHUB_OUTPUT" />
-    <Exec Command="'assemblyname=$(AssemblyName)' >> $GITHUB_OUTPUT" />
-    <Exec Command="'artifactpath=$(ProjectDir)$(ArtifactDestination)' >> $GITHUB_OUTPUT" />
+    <Exec Command="echo 'filename=$(ArtifactName)' >> $GITHUB_OUTPUT" />
+    <Exec Command="echo 'assemblyname=$(AssemblyName)' >> $GITHUB_OUTPUT" />
+    <Exec Command="echo 'artifactpath=$(ProjectDir)$(ArtifactDestination)' >> $GITHUB_OUTPUT" />
     <Message Text="Copying '$(OutputAssemblyName).dll' to '$(ProjectDir)$(ArtifactDestination)\Plugins\$(AssemblyName).dll'" Importance="high"/>
     <ItemGroup>
       <VCRFiles Include="..\VoiceCommandRecognizer\bin\$(Configuration)\*.exe" />
