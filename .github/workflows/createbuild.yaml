@@ -37,7 +37,7 @@ jobs:
               id: set-outputs
               shell: pwsh
               run: |
-                $content = Get-Content -Path build_output.txt
+                $content = Get-Content -Path /VoiceCommander/build_output.txt
                 foreach ($line in $content -split ';') {
                   $kvp = $line -split '='
                   $key = $kvp[0]
