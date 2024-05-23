@@ -33,26 +33,29 @@ jobs:
               run: msbuild ${{ github.workspace }}/VoiceCommander.sln /property:Configuration=Release
             - name: GitStatus
               run: git status
-            - name: Export environment variables
-              id: export-vars
+            - name: Read variables from file and set outputs
+              id: set-outputs
               run: |
-                echo "filename=$(printenv filename)" >> $GITHUB_ENV
-                echo "assemblyname=$(printenv assemblyname)" >> $GITHUB_ENV
-                echo "artifactpath=$(printenv artifactpath)" >> $GITHUB_ENV
+                while IFS=';' read -ra vars; do
+                  for var in "${vars[@]}"; do
+                    IFS='=' read -r key value <<< "$var"
+                    echo "$key=$value" >> $GITHUB_OUTPUT
+                  done
+                done < build_output.txt
             - name: Echo Filename
               run: echo $BUILDTEXT $ASSEMBLYNAME
               env:
-                  BUILDTEXT: Filename=${{ env.filename }}
-                  ASSEMBLYNAME: AssemblyName=${{ env.assemblyname }}
+                  BUILDTEXT: Filename=${{ steps.set-outputs.outputs.filename }}
+                  ASSEMBLYNAME: AssemblyName=${{ steps.set-outputs.outputs.assemblyname }}
             - name: Upload Artifact
               uses: actions/upload-artifact@v4
               with:
-                  name: ${{ env.filename }}.zip
-                  path: ${{ env.artifactpath }}
+                  name: ${{ steps.set-outputs.outputs.filename }}.zip
+                  path: ${{ steps.set-outputs.outputs.artifactpath }}
             - name: Release
               uses: softprops/action-gh-release@v1
               if: startsWith(github.ref, 'refs/tags/')
               with:
-                  files: ${{ env.filename }}.zip
+                  files: ${{ steps.set-outputs.outputs.filename }}.zip
               env:
                   GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}

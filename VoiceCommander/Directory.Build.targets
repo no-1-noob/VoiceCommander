@@ -11,6 +11,7 @@
     <!--Path to folder to be zipped. Needs to be relative to the project directory to work without changes to the 'BuildForCI' target.-->
     <ArtifactDestination>$(OutputPath)Final</ArtifactDestination>
     <ErrorOnMismatchedVersions Condition="'$(Configuration)' == 'Release'">True</ErrorOnMismatchedVersions>
+    <OutputFile>$(MSBuildProjectDirectory)\build_output.txt</OutputFile>
   </PropertyGroup>
   <!--Build Targets-->
   <!--Displays a warning if BeatSaberModdingTools.Tasks is not installed.-->
@@ -51,9 +52,10 @@
     </PropertyGroup>
     <Message Text="Building for CI" Importance="high"/>
     <Message Text="PluginVersion: $(PluginVersion), AssemblyVersion: $(AssemblyVersion), GameVersion: $(GameVersion)" Importance="high"/>
-    <SetEnv Name="filename" Value="$(ArtifactName)" />
-    <SetEnv Name="assemblyname" Value="$(AssemblyName)" />
-    <SetEnv Name="artifactpath" Value="$(ProjectDir)$(ArtifactDestination)" />
+    <WriteLinesToFile
+      File="$(OutputFile)"
+      Lines="filename=$(ArtifactName);assemblyname=$(AssemblyName);assemblyname=$(ProjectDir)$(ArtifactDestination)"
+      Overwrite="true" />
     <Message Text="Copying '$(OutputAssemblyName).dll' to '$(ProjectDir)$(ArtifactDestination)\Plugins\$(AssemblyName).dll'" Importance="high"/>
     <ItemGroup>
       <VCRFiles Include="..\VoiceCommandRecognizer\bin\$(Configuration)\*.exe" />
