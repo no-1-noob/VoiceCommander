@@ -25,7 +25,7 @@ jobs:
                   manifest: ${{ github.workspace }}/VoiceCommander/manifest.json
             - name: Build
               id: Build
-              run: msbuild build --configuration Release
+              run: msbuild ${{ github.workspace }}/VoiceCommander.sln /property:Configuration=Release
             - name: GitStatus
               run: git status
             - name: Echo Filename
