@@ -35,27 +35,30 @@ jobs:
               run: git status
             - name: Read variables from file and set outputs
               id: set-outputs
+              shell: pwsh
               run: |
-                while IFS=';' read -ra vars; do
-                  for var in "${vars[@]}"; do
-                    IFS='=' read -r key value <<< "$var"
-                    echo "$key=$value" >> $GITHUB_OUTPUT
-                  done
-                done < build_output.txt
+                $content = Get-Content -Path build_output.txt
+                foreach ($line in $content -split ';') {
+                  $kvp = $line -split '='
+                  $key = $kvp[0]
+                  $value = $kvp[1]
+                  Write-Output ("$key=$value") >> $env:GITHUB_ENV
+                  Write-Output ("$key=$value") >> $env:GITHUB_OUTPUT
+                }
             - name: Echo Filename
               run: echo $BUILDTEXT $ASSEMBLYNAME
               env:
-                  BUILDTEXT: Filename=${{ steps.set-outputs.outputs.filename }}
-                  ASSEMBLYNAME: AssemblyName=${{ steps.set-outputs.outputs.assemblyname }}
+                  BUILDTEXT: Filename=${{ $env:filename }}
+                  ASSEMBLYNAME: AssemblyName=${{ $env:assemblyname }}
             - name: Upload Artifact
               uses: actions/upload-artifact@v4
               with:
-                  name: ${{ steps.set-outputs.outputs.filename }}.zip
-                  path: ${{ steps.set-outputs.outputs.artifactpath }}
+                  name: ${{ $env:filename }}.zip
+                  path: ${{ $env:artifactpath }}
             - name: Release
               uses: softprops/action-gh-release@v1
               if: startsWith(github.ref, 'refs/tags/')
               with:
-                  files: ${{ steps.set-outputs.outputs.filename }}.zip
+                  files: ${{ $env:filename }}.zip
               env:
                   GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
