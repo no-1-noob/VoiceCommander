@@ -12,6 +12,8 @@ namespace VoiceCommander.Utils
 {
     internal class Utils
     {
+        internal static int DefaultPort { get; } = 9805;
+
         internal static IRecognizer CreateRecognizer(List<VoiceCommand> lsKeyWordActions, EventHandler<(string, float)> Recognizer_keyWordRecognized)
         {
             IRecognizer recognizer;
@@ -29,6 +31,22 @@ namespace VoiceCommander.Utils
             recognizer.OnKeyWordRecognized += Recognizer_keyWordRecognized;
 
             return recognizer;
+        }
+
+        internal static List<VoiceCommand> GetAllVocieCommands()
+        {
+            List<VoiceCommand> lsAllCommands = new List<VoiceCommand>();
+            foreach (var item in Plugin.AvailableVoiceCommandSettings)
+            {
+                IVoiceCommandHandler voiceCommandHandler = (IVoiceCommandHandler)Activator.CreateInstance(item.CommandType);
+                foreach (var voicecommand in voiceCommandHandler.lsVoicecommand)
+                {
+                    lsAllCommands.Add(voicecommand);
+                    Plugin.Log.Error(voicecommand.ToString());
+                }
+            }
+
+            return lsAllCommands;
         }
     }
 }

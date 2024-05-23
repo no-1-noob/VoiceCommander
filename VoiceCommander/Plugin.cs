@@ -55,7 +55,6 @@ namespace VoiceCommander
                 Log.Error($"Installing to {location}");
                 zenjector.Install<VoiceCommandInstaller>(location, location);
             }
-            zenjector.Install<VoiceCommandSettingsInstaller>(Location.App);
 
             try
             {

@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using VoiceCommander.Configuration;
 using VoiceCommander.Data;
 using VoiceCommander.Interfaces;
 using VoiceCommander.Recognizer;
+using VoiceCommander.Utils;
 using Zenject;
 
 namespace VoiceCommander.Mgr
@@ -19,6 +21,25 @@ namespace VoiceCommander.Mgr
         {
             SetupAndCheckKeyWords();
             CreateRecognizer();
+            VCEventHandler.OnSettingsChanged += OnSettingsChanged;
+            VCEventHandler.OnSettingsRecognizerStateChange += OnSettingsRecognizerStateChange;
+        }
+
+        public void OnSettingsChanged(object sender, EventArgs e)
+        {
+            //Reload Settings and restart VoiceRecognition
+            Plugin.Log.Error($"Reload Settings and restart VoiceRecognition");
+            foreach (var item in lsKeyWordActions)
+            {
+                PluginConfig.Instance.ApplySettingsToVoiceCommand(item);
+            }
+            recognizer.ResetRecognizer(lsKeyWordActions.Select(x => x.ActualKeyword).ToList());
+        }
+
+        private void OnSettingsRecognizerStateChange(object sender, bool isActive)
+        {
+            if (isActive) recognizer.Pause();
+            else recognizer.Start();
         }
 
         private void SetupAndCheckKeyWords()
@@ -31,9 +52,10 @@ namespace VoiceCommander.Mgr
 
         public void Dispose()
         {
-            Plugin.Log.Error($"Dispose coreMgr");
             if(recognizer != null) recognizer.OnKeyWordRecognized -= Recognizer_keyWordRecognized;
             recognizer?.CloseAndCleanupRecognizer();
+            VCEventHandler.OnSettingsChanged -= OnSettingsChanged;
+            VCEventHandler.OnSettingsRecognizerStateChange -= OnSettingsRecognizerStateChange;
         }
 
         private void CreateRecognizer()

@@ -1,3 +1,21 @@
 ﻿<scrollable-settings-container xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xsi:schemaLocation='https://monkeymanboy.github.io/BSML-Docs/ https://raw.githubusercontent.com/monkeymanboy/BSML-Docs/gh-pages/BSMLSchema.xsd'>
-	<text text='RightView' italics='true' align='Center' font-size='4' />
+  <vertical vertical-fit='PreferredSize' preferred-width='100' child-align='MiddleCenter' xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xsi:schemaLocation='https://monkeymanboy.github.io/BSML-Docs/ https://raw.githubusercontent.com/monkeymanboy/BSML-Docs/gh-pages/BSMLSchema.xsd'>
+    <text text='Test your voice comands here. All commands are active together' italics='true' align='Center' font-size='4' />
+    <button text='~recognizer-action' on-click='click-toggle-test-recognizer'/>
+    <horizontal>
+      <text text='Keyword: '>
+      </text>
+      <text text='~recognized-text' italics='true' align='Right' font-size='4' />
+    </horizontal>
+    <horizontal>
+      <text text='Confidence: '>
+      </text>
+      <text text='~recognized-confidence' italics='true' align='Right' font-size='4' />
+    </horizontal>
+    <horizontal>
+      <text text='Timestamp: '>
+      </text>
+      <text text='~recognized-timestamp' align='Right' font-size='4' />
+    </horizontal>
+  </vertical>
 </scrollable-settings-container>
