@@ -49,12 +49,13 @@
     <PropertyGroup>
       <!--Set 'ArtifactName' if it failed before.-->
       <ArtifactName Condition="'$(ArtifactName)' == ''">$(AssemblyName)</ArtifactName>
+      <CorrectedArtifactPath>$([System.String]::new('$(ProjectDir)').Replace('\', '/'))</CorrectedArtifactPath>
     </PropertyGroup>
     <Message Text="Building for CI" Importance="high"/>
     <Message Text="PluginVersion: $(PluginVersion), AssemblyVersion: $(AssemblyVersion), GameVersion: $(GameVersion)" Importance="high"/>
     <WriteLinesToFile
       File="$(OutputFile)"
-      Lines="filename=$(ArtifactName).zip;assemblyname=$(AssemblyName);artifactpath=$(ProjectDir)$(ArtifactDestination)"
+      Lines="filename=$(ArtifactName).zip;assemblyname=$(AssemblyName);artifactpath=$(CorrectedArtifactPath)"
       Overwrite="true" />
     <Message Text="Copying '$(OutputAssemblyName).dll' to '$(ProjectDir)$(ArtifactDestination)\Plugins\$(AssemblyName).dll'" Importance="high"/>
     <ItemGroup>
