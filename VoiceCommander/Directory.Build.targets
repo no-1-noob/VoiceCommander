@@ -49,7 +49,7 @@
     <PropertyGroup>
       <!--Set 'ArtifactName' if it failed before.-->
       <ArtifactName Condition="'$(ArtifactName)' == ''">$(AssemblyName)</ArtifactName>
-      <CorrectedArtifactPath>$([System.String]::new('$(ProjectDir)').Replace('\', '/'))</CorrectedArtifactPath>
+      <CorrectedArtifactPath>$([System.String]::new('$(ProjectDir)$(ArtifactDestination)').Replace('\', '/'))</CorrectedArtifactPath>
     </PropertyGroup>
     <Message Text="Building for CI" Importance="high"/>
     <Message Text="PluginVersion: $(PluginVersion), AssemblyVersion: $(AssemblyVersion), GameVersion: $(GameVersion)" Importance="high"/>
