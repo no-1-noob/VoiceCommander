@@ -60,6 +60,6 @@ jobs:
               uses: softprops/action-gh-release@v2
               if: startsWith(github.ref, 'refs/tags/')
               with:
-                  files: */*.zip
+                  files: '*/*.zip'
               env:
                   GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
