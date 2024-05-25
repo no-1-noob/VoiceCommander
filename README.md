@@ -56,7 +56,7 @@ namespace MyMod.Command
 ```
 
 ## 2) Add feature to the manifest
-
+<i>Please remove the comments if you copy this example as json doenst support comments</i>
 ```json
 {
   "$schema": "https://raw.githubusercontent.com/bsmg/BSIPA-MetadataFileSchema/master/Schema.json",
