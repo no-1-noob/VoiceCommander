@@ -1,0 +1,3 @@
+[submodule "SimpleUpdateChecker"]
+	path = SimpleUpdateChecker
+	url = https://github.com/no-1-noob/SimpleUpdateChecker.git
