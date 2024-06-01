@@ -55,7 +55,7 @@
     <Message Text="PluginVersion: $(PluginVersion), AssemblyVersion: $(AssemblyVersion), GameVersion: $(GameVersion)" Importance="high"/>
     <WriteLinesToFile
       File="$(OutputFile)"
-      Lines="filename=$(ArtifactName).zip;assemblyname=$(AssemblyName);artifactpath=$(CorrectedArtifactPath)"
+      Lines="filename=$(ArtifactName);assemblyname=$(AssemblyName);artifactpath=$(CorrectedArtifactPath)"
       Overwrite="true" />
     <Message Text="Copying '$(OutputAssemblyName).dll' to '$(ProjectDir)$(ArtifactDestination)\Plugins\$(AssemblyName).dll'" Importance="high"/>
     <ItemGroup>
@@ -69,7 +69,7 @@
     <Copy SourceFiles="$(OutputAssemblyName).xml" DestinationFiles="$(ArtifactDestination)\Plugins\$(AssemblyName).xml"/>
   </Target>
   <!--Creates a BeatMods compliant zip file with the release.-->
-  <Target Name="ZipRelease" AfterTargets="Build;BuildForCI" Condition="'$(DisableZipRelease)' != 'True' AND '$(Configuration)' == 'Release' AND '$(BSMTTaskAssembly)' != ''">
+  <Target Name="ZipRelease" AfterTargets="BuildForCI" Condition="'$(ContinuousIntegrationBuild)' == 'True' AND '$(Configuration)' == 'Release' AND '$(BSMTTaskAssembly)' != ''">
     <Message Text="ZipRelease" Importance="high"/>
     <PropertyGroup>
       <!--Set 'ArtifactName' if it failed before.-->
