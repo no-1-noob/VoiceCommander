@@ -143,6 +143,12 @@
     <EmbeddedResource Include="manifest.json" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="..\SimpleUpdateChecker\**\*.cs" Link="SimpleUpdateChecker\%(RecursiveDir)%(FileName)%(Extension)" />
+    <EmbeddedResource Include="..\SimpleUpdateChecker\**\*.bsml" Link="SimpleUpdateChecker\%(RecursiveDir)%(FileName)%(Extension)" />
+    <Compile Remove="..\SimpleUpdateChecker\obj\**\*;..\SimpleUpdateChecker\**\obj\**\*" />
+    <Compile Remove="..\SimpleUpdateChecker\**\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
     <None Include="Directory.Build.props" Condition="Exists('Directory.Build.props')" />
     <None Include="Directory.Build.targets" />
     <Compile Include="UI\VoiceCommanderFlowCoordinator.cs" />

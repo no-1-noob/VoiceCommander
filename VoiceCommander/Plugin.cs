@@ -4,6 +4,7 @@ using HMUI;
 using IPA;
 using IPA.Config.Stores;
 using IPA.Utilities;
+using SimpleUpdateChecker.Plugin;
 using SiraUtil.Zenject;
 using System;
 using System.Collections.Generic;
@@ -17,10 +18,9 @@ using IPALogger = IPA.Logging.Logger;
 namespace VoiceCommander
 {
     [Plugin(RuntimeOptions.SingleStartInit)]
-    internal class Plugin
+    internal class Plugin : SimpleUpdatePlugin
     {
         internal static Plugin Instance { get; private set; }
-        internal static IPALogger Log { get; private set; }
 
         internal static List<VoiceCommandSettings> AvailableVoiceCommandSettings = new List<VoiceCommandSettings>();
 
@@ -39,8 +39,14 @@ namespace VoiceCommander
         [Init]
         public void Init(IPALogger logger, Zenjector zenjector, IPA.Config.Config conf)
         {
+            base.CreateSimpleUpdateChecker(logger, zenjector, "https://mods.no1noob.net/api/VoiceCommander_1_29", "https://github.com/no-1-noob/VoiceCommander/releases");
             Instance = this;
-            Log = logger;
+
+#if DEBUG
+            Plugin.Log.Error("!!! This is still DEBUGG !!!");
+            Plugin.Log.Error("!!! This is still DEBUGG !!!");
+            Plugin.Log.Error("!!! This is still DEBUGG !!!");
+#endif
             Log.Info($"VoiceCommander initialized. with config {conf}");
 
             if(conf != null)
@@ -83,8 +89,9 @@ namespace VoiceCommander
         }
 
         [OnExit]
-        public void OnApplicationQuit()
+        new public void OnApplicationQuit()
         {
+            base.OnApplicationQuit();
             try
             {
                 //Fcukking kill the voice recognition when closing BS

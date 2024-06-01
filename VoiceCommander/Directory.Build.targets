@@ -11,6 +11,7 @@
     <!--Path to folder to be zipped. Needs to be relative to the project directory to work without changes to the 'BuildForCI' target.-->
     <ArtifactDestination>$(OutputPath)Final</ArtifactDestination>
     <ErrorOnMismatchedVersions Condition="'$(Configuration)' == 'Release'">True</ErrorOnMismatchedVersions>
+    <OutputFile>$(MSBuildProjectDirectory)\build_output.txt</OutputFile>
   </PropertyGroup>
   <!--Build Targets-->
   <!--Displays a warning if BeatSaberModdingTools.Tasks is not installed.-->
@@ -48,12 +49,14 @@
     <PropertyGroup>
       <!--Set 'ArtifactName' if it failed before.-->
       <ArtifactName Condition="'$(ArtifactName)' == ''">$(AssemblyName)</ArtifactName>
+      <CorrectedArtifactPath>$([System.String]::new('$(ProjectDir)$(ArtifactDestination)').Replace('\', '/'))</CorrectedArtifactPath>
     </PropertyGroup>
     <Message Text="Building for CI" Importance="high"/>
     <Message Text="PluginVersion: $(PluginVersion), AssemblyVersion: $(AssemblyVersion), GameVersion: $(GameVersion)" Importance="high"/>
-    <Message Text="::set-output name=filename::$(ArtifactName)" Importance="high"/>
-    <Message Text="::set-output name=assemblyname::$(AssemblyName)" Importance="high"/>
-    <Message Text="::set-output name=artifactpath::$(ProjectDir)$(ArtifactDestination)" Importance="high"/>
+    <WriteLinesToFile
+      File="$(OutputFile)"
+      Lines="filename=$(ArtifactName);assemblyname=$(AssemblyName);artifactpath=$(CorrectedArtifactPath)"
+      Overwrite="true" />
     <Message Text="Copying '$(OutputAssemblyName).dll' to '$(ProjectDir)$(ArtifactDestination)\Plugins\$(AssemblyName).dll'" Importance="high"/>
     <ItemGroup>
       <VCRFiles Include="..\VoiceCommandRecognizer\bin\$(Configuration)\*.exe" />
@@ -66,7 +69,8 @@
     <Copy SourceFiles="$(OutputAssemblyName).xml" DestinationFiles="$(ArtifactDestination)\Plugins\$(AssemblyName).xml"/>
   </Target>
   <!--Creates a BeatMods compliant zip file with the release.-->
-  <Target Name="ZipRelease" AfterTargets="Build" Condition="'$(DisableZipRelease)' != 'True' AND '$(Configuration)' == 'Release' AND '$(BSMTTaskAssembly)' != ''">
+  <Target Name="ZipRelease" AfterTargets="BuildForCI" Condition="'$(ContinuousIntegrationBuild)' == 'True' AND '$(Configuration)' == 'Release' AND '$(BSMTTaskAssembly)' != ''">
+    <Message Text="ZipRelease" Importance="high"/>
     <PropertyGroup>
       <!--Set 'ArtifactName' if it failed before.-->
       <ArtifactName Condition="'$(ArtifactName)' == ''">$(AssemblyName)</ArtifactName>
@@ -84,6 +88,7 @@
     <Copy SourceFiles="$(OutputAssemblyName).dll" DestinationFiles="$(ArtifactDestination)\Plugins\$(AssemblyName).dll"/>
     <Copy SourceFiles="$(OutputAssemblyName).xml" DestinationFiles="$(ArtifactDestination)\Plugins\$(AssemblyName).xml"/>
     <Message Text="PluginVersion: $(PluginVersion), AssemblyVersion: $(AssemblyVersion), GameVersion: $(GameVersion)" Importance="high"/>
+    <Message Text="DestinationDirectory: $(DestinationDirectory)" Importance="high"/>
     <Delete Files="@(OldZips)" TreatErrorsAsWarnings="true" ContinueOnError="true"/>
     <ZipDir SourceDirectory="$(ArtifactDestination)" DestinationFile="$(DestinationDirectory)$(ArtifactName).zip"/>
   </Target>

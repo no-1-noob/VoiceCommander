@@ -7,7 +7,11 @@
   "description": "Allow other mods to implement voice commands",
   "gameVersion": "1.29.0",
   "dependsOn": {
-    "BSIPA": "^4.2.0"
+    "BSIPA": "^4.2.0",
+    "BeatSaberMarkupLanguage": "^1.6.1",
+    "SiraUtil": "^3.1.2",
+    "websocket-sharp": "^1.0.4",
+    "BS Utils": "^1.12.2"
   },
   "features": {
     "IPA.DefineFeature": {
