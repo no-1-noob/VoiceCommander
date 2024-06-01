@@ -63,4 +63,4 @@ jobs:
               env:
                   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
               run:
-                  gh release upload ${{ github.ref_name }} (get-item *.zip)
+                  gh release upload ${{ github.ref_name }} /VoiceCommander/bin/Release/Final/${{ env.filename }}
