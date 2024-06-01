@@ -59,7 +59,8 @@ jobs:
                   name: ${{ env.filename }}
                   path: ${{ env.artifactpath }}
             - name: List files
-                  run: ls -al D:/a/VoiceCommander/VoiceCommander/VoiceCommander/bin/Release/Final
+              run: Get-ChildItem -Path D:/a/VoiceCommander/VoiceCommander/VoiceCommander/bin/Release/Final
+              shell: pwsh
             - name: Upload Release Asset
               if: startsWith(github.ref, 'refs/tags/')
               env:
