@@ -88,6 +88,7 @@
     <Copy SourceFiles="$(OutputAssemblyName).dll" DestinationFiles="$(ArtifactDestination)\Plugins\$(AssemblyName).dll"/>
     <Copy SourceFiles="$(OutputAssemblyName).xml" DestinationFiles="$(ArtifactDestination)\Plugins\$(AssemblyName).xml"/>
     <Message Text="PluginVersion: $(PluginVersion), AssemblyVersion: $(AssemblyVersion), GameVersion: $(GameVersion)" Importance="high"/>
+    <Message Text="DestinationDirectory: $(DestinationDirectory)" Importance="high"/>
     <Delete Files="@(OldZips)" TreatErrorsAsWarnings="true" ContinueOnError="true"/>
     <ZipDir SourceDirectory="$(ArtifactDestination)" DestinationFile="$(DestinationDirectory)$(ArtifactName).zip"/>
   </Target>
