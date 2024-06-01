@@ -58,6 +58,8 @@ jobs:
               with:
                   name: ${{ env.filename }}
                   path: ${{ env.artifactpath }}
+            - name: List files
+                  run: ls -al D:/a/VoiceCommander/VoiceCommander/VoiceCommander/bin/Release/Final
             - name: Upload Release Asset
               if: startsWith(github.ref, 'refs/tags/')
               env:
