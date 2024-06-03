@@ -1,3 +1,5 @@
+[![Build](https://github.com/no-1-noob/VoiceCommander/actions/workflows/createbuild.yaml/badge.svg?branch=master)](https://github.com/no-1-noob/VoiceCommander/actions/workflows/createbuild.yaml)
+
 A BeatSaber mod that allows voice commands to trigger actions ingame.
 
 <b>This mod does nothing on it's own so you need another mod that uses this one. See below for a list of known mods with VoiceCommander support</b>
@@ -5,10 +7,10 @@ A BeatSaber mod that allows voice commands to trigger actions ingame.
 # Players
 
 Download the mod from the release page, put the contents in the plugin folder (including the VCR sub folder)
-### Why is there a random .exe in the VCR folder?
+### Why is there a commandline window while playing and a random .exe in the VCR folder?
 The built in voice recognition of Unity only works on Win10 and also sometimes does not resume to work after the game has been paused using SteamVR. So this small exe starts a programm, that handles the voice recognition and the plugin running in BeatSaber can attach itself to this programm.
 
-While it is running you will see a console window with some output, this closes when the game is closed normally. If the game was force closed you have to close the command window yourself.
+While it is running you will see a console window with some output, this closes when the game is closed. If the game was force closed you have to close the command window yourself.
 
 ### Settings
 For each mod that uses the VoiceCommander mod you can override the Keyword that triggers the action and the confidence needed to trigger it.

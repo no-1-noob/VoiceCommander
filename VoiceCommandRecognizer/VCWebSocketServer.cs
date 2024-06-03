@@ -17,6 +17,8 @@ namespace VoiceCommandRecognizer
         private WebSocketServer _server;
         private List<string> _keywords = new List<string>();
         private SpeechRecognitionEngine listener;
+        private VoiceCommandMessage currentCommand = null;
+        internal List<VoiceCommandMessage> lsMessageBuffer = new List<VoiceCommandMessage>();
 
         public VCWebSocketServer()
         {
@@ -30,7 +32,17 @@ namespace VoiceCommandRecognizer
             _server = new WebSocketServer($"{_serverUrl}");
             _server.AddWebSocketService<VCRSocketBehaviour>("/socket");
             _server.Start();
-            Program.Log($"WebSocket started at {_serverUrl}", Program.MsgType.SUCCESS);
+            Program.Log($"VoiceCommander recognizer started at {_serverUrl}", Program.MsgType.SUCCESS);
+
+            Task.Run(async () =>
+            {
+                while (true)
+                {
+                    if (currentCommand == null)
+                        HandleBuffer();
+                    await Task.Delay(50);
+                }
+            });
         }
 
         public void CloseSocket()
@@ -51,23 +63,31 @@ namespace VoiceCommandRecognizer
                     listener.SpeechRecognized += new EventHandler<SpeechRecognizedEventArgs>(listener_SpeechRecognized);
                 }
                 listener.RecognizeAsyncStop();
+                listener.RecognizeAsyncCancel();
                 listener.UnloadAllGrammars();
-                foreach (var keyword in _keywords.Distinct())
-                {
-                    Program.Log($"Add to SpeechRecognitionEngine: {keyword}", Program.MsgType.DEBUG);
-                    GrammarBuilder builder = new GrammarBuilder(keyword);
-                    Grammar g = new Grammar(builder);
-                    listener.LoadGrammar(g);
-                }
-                if(listener.Grammars.Count > 0)
-                {
-                    listener.RecognizeAsync(RecognizeMode.Multiple);
-                }
+                StartRecognizer();
             }
             catch (Exception ex)
             {
                 Program.Log($"Error while ReStartRecognition {ex.Message}", Program.MsgType.ERROR);
             }
+        }
+
+        private void StartRecognizer()
+        {
+            Program.Log($"StartRecognizer", Program.MsgType.DEBUG);
+            foreach (var keyword in _keywords.GroupBy(x => x))
+            {
+                Program.Log($"Add to SpeechRecognitionEngine: {keyword.Key} : Count : {keyword.Count<string>()}", Program.MsgType.DEBUG);
+                GrammarBuilder builder = new GrammarBuilder(keyword.Key);
+                Grammar g = new Grammar(builder);
+                listener.LoadGrammar(g);
+            }
+            if (listener.Grammars.Count > 0)
+            {
+                listener.RecognizeAsync(RecognizeMode.Multiple);
+            }
+            currentCommand = null;
         }
 
         private void listener_SpeechRecognized(object sender, SpeechRecognizedEventArgs e)
@@ -80,7 +100,17 @@ namespace VoiceCommandRecognizer
             }
         }
 
-        public void HandleMessage(VoiceCommandMessage vcMessage)
+        private void HandleBuffer()
+        {
+            if (lsMessageBuffer.Count > 0)
+            {
+                currentCommand = lsMessageBuffer.First();
+                lsMessageBuffer.RemoveAt(0);
+                HandleMessage(currentCommand);
+            }
+        }
+
+        private void HandleMessage(VoiceCommandMessage vcMessage)
         {
             switch (vcMessage.type)
             {
@@ -130,8 +160,8 @@ namespace VoiceCommandRecognizer
             {
                 try
                 {
-                    var socketData = JsonConvert.DeserializeObject<VoiceCommandMessage>(e.Data);
-                    Program.VCWebSocketServer.HandleMessage(socketData);
+                    VoiceCommandMessage socketData = JsonConvert.DeserializeObject<VoiceCommandMessage>(e.Data);
+                    Program.VCWebSocketServer.lsMessageBuffer.Add(socketData);
                 }
                 catch (Exception ex)
                 {
