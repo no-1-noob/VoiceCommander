@@ -36,13 +36,12 @@ namespace VoiceCommander.Utils
         internal static List<VoiceCommand> GetAllVocieCommands()
         {
             List<VoiceCommand> lsAllCommands = new List<VoiceCommand>();
-            foreach (var item in Plugin.AvailableVoiceCommandSettings)
+            foreach (var item in Plugin.AvailableVoiceCommandFeatureSettings)
             {
                 IVoiceCommandHandler voiceCommandHandler = (IVoiceCommandHandler)Activator.CreateInstance(item.CommandType);
                 foreach (var voicecommand in voiceCommandHandler.lsVoicecommand)
                 {
                     lsAllCommands.Add(voicecommand);
-                    Plugin.Log.Error(voicecommand.ToString());
                 }
             }
 

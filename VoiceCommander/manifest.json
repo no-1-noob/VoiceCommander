@@ -15,7 +15,7 @@
   },
   "features": {
     "IPA.DefineFeature": {
-      "type": "VoiceCommander.VoiceCommandFeature",
+      "type": "VoiceCommander.FeatureDefinition.VoiceCommandFeature",
       "name": "VoiceCommander.VoiceCommand"
     }
   }

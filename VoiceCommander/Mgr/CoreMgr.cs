@@ -1,10 +1,11 @@
-﻿using System;
+﻿using SiraUtil.Zenject;
+using System;
 using System.Collections.Generic;
 using System.Linq;
+using UnityEngine.SceneManagement;
 using VoiceCommander.Configuration;
 using VoiceCommander.Data;
 using VoiceCommander.Interfaces;
-using VoiceCommander.Recognizer;
 using VoiceCommander.Utils;
 using Zenject;
 
@@ -12,23 +13,62 @@ namespace VoiceCommander.Mgr
 {
     internal class CoreMgr : IInitializable, IDisposable
     {
+        private const string MainMenu = "MainMenu";
         [Inject] protected List<IVoiceCommandHandler> lsVoiceCommand = new List<IVoiceCommandHandler>();
 
         private List<VoiceCommand> lsKeyWordActions = new List<VoiceCommand>();
         private IRecognizer recognizer;
+        private Location location;
+        private bool active = false;
+
+        public CoreMgr(Location location)
+        {
+            this.location = location;
+        }
 
         public void Initialize()
         {
+            active = true;
             SetupAndCheckKeyWords();
             CreateRecognizer();
             VCEventHandler.OnSettingsChanged += OnSettingsChanged;
             VCEventHandler.OnSettingsRecognizerStateChange += OnSettingsRecognizerStateChange;
+            SceneManager.activeSceneChanged += SceneManager_activeSceneChanged;
         }
 
-        public void OnSettingsChanged(object sender, EventArgs e)
+        public void Dispose()
+        {
+            active = false;
+            lsKeyWordActions.Clear();
+            if (recognizer != null) recognizer.OnKeyWordRecognized -= Recognizer_keyWordRecognized;
+            recognizer?.CloseAndCleanupRecognizer();
+            VCEventHandler.OnSettingsChanged -= OnSettingsChanged;
+            VCEventHandler.OnSettingsRecognizerStateChange -= OnSettingsRecognizerStateChange;
+        }
+
+        /// <summary>
+        /// Special Scene change detection for Main menu, as it is not destroyed while changing to gameplay
+        /// </summary>
+        /// <param name="prevScene"></param>
+        /// <param name="currentScene"></param>
+        private void SceneManager_activeSceneChanged(Scene prevScene, Scene currentScene)
+        {
+            if (location.HasFlag(Location.Menu))
+            {
+                if (active && prevScene.name == MainMenu && currentScene.name != MainMenu)
+                {
+                    Dispose();
+                }
+                if (!active && prevScene.name != MainMenu && currentScene.name == MainMenu)
+                {
+                    Initialize();
+                }
+            }
+        }
+
+        private void OnSettingsChanged(object sender, EventArgs e)
         {
             //Reload Settings and restart VoiceRecognition
-            Plugin.Log.Error($"Reload Settings and restart VoiceRecognition");
             foreach (var item in lsKeyWordActions)
             {
                 PluginConfig.Instance.ApplySettingsToVoiceCommand(item);
@@ -48,14 +88,6 @@ namespace VoiceCommander.Mgr
             {
                 lsKeyWordActions.Add(vcommand);
             }
-        }
-
-        public void Dispose()
-        {
-            if(recognizer != null) recognizer.OnKeyWordRecognized -= Recognizer_keyWordRecognized;
-            recognizer?.CloseAndCleanupRecognizer();
-            VCEventHandler.OnSettingsChanged -= OnSettingsChanged;
-            VCEventHandler.OnSettingsRecognizerStateChange -= OnSettingsRecognizerStateChange;
         }
 
         private void CreateRecognizer()

@@ -11,6 +11,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using VoiceCommander.Configuration;
+using VoiceCommander.FeatureDefinition;
 using VoiceCommander.Installers;
 using VoiceCommander.UI;
 using IPALogger = IPA.Logging.Logger;
@@ -22,7 +23,7 @@ namespace VoiceCommander
     {
         internal static Plugin Instance { get; private set; }
 
-        internal static List<VoiceCommandSettings> AvailableVoiceCommandSettings = new List<VoiceCommandSettings>();
+        internal static List<VoiceCommandFeatureSettings> AvailableVoiceCommandFeatureSettings = new List<VoiceCommandFeatureSettings>();
 
         internal static FlowCoordinator ParentFlow { get; private set; }
         private static VoiceCommanderFlowCoordinator _flow;
@@ -41,24 +42,16 @@ namespace VoiceCommander
         {
             base.CreateSimpleUpdateChecker(logger, zenjector, "https://mods.no1noob.net/api/VoiceCommander_1_29", "https://github.com/no-1-noob/VoiceCommander/releases");
             Instance = this;
-
-#if DEBUG
-            Plugin.Log.Error("!!! This is still DEBUGG !!!");
-            Plugin.Log.Error("!!! This is still DEBUGG !!!");
-            Plugin.Log.Error("!!! This is still DEBUGG !!!");
-#endif
-            Log.Info($"VoiceCommander initialized. with config {conf}");
-
             if(conf != null)
             {
                 PluginConfig.Instance = conf.Generated<Configuration.PluginConfig>();
                 PluginConfig.Instance.Changed();
             }
 
-            MenuButtons.instance.RegisterButton(new MenuButton("VoiceCommander", "Controll stuff with your voice", ShowSettingsFlow, true));
+            MenuButtons.instance.RegisterButton(new MenuButton("Voice Commander", "Controll stuff with your voice", ShowSettingsFlow, true));
             foreach (Location location in (Location[])Enum.GetValues(typeof(Location)))
             {
-                Log.Error($"Installing to {location}");
+                //Log.Error($"Installing to {location}");
                 zenjector.Install<VoiceCommandInstaller>(location, location);
             }
 
@@ -79,7 +72,7 @@ namespace VoiceCommander
             }
             catch (Exception e)
             {
-                Plugin.Log.Error($"Process {e.Message}");
+                Plugin.Log.Error($"Error starting VoiceCommandRecognizer process {e.Message}");
             }
         }
 

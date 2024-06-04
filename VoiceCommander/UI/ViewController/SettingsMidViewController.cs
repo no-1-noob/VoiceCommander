@@ -95,7 +95,6 @@ namespace VoiceCommander.UI.ViewController
         {
             get
             {
-                Plugin.Log.Error($"current-command {dropdownCommandController}");
                 return _currentCommand.Identifier;
             }
         }

@@ -3,16 +3,16 @@ using SiraUtil.Zenject;
 using System;
 using System.Collections.Generic;
 
-namespace VoiceCommander
+namespace VoiceCommander.FeatureDefinition
 {
     internal class VoiceCommandSettingsList
     {
         [JsonProperty(Required = Required.Always)]
-        public List<VoiceCommandSettings> Commands;
+        public List<VoiceCommandFeatureSettings> Commands;
 
     }
 
-    internal class VoiceCommandSettings
+    internal class VoiceCommandFeatureSettings
     {
         [JsonProperty(Required = Required.Always)]
         public string Name;

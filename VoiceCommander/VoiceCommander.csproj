@@ -135,16 +135,16 @@
     <Compile Include="Utils\Enum.cs" />
     <Compile Include="Utils\EventHandler.cs" />
     <Compile Include="Utils\Utils.cs" />
-    <Compile Include="VoiceCommandSettings.cs" />
+    <Compile Include="FeatureDefinition\VoiceCommandFeatureSettings.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="VoiceCommandFeature.cs" />
+    <Compile Include="FeatureDefinition\VoiceCommandFeature.cs" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="manifest.json" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="..\SimpleUpdateChecker\**\*.cs" Link="SimpleUpdateChecker\%(RecursiveDir)%(FileName)%(Extension)" />
-    <EmbeddedResource Include="..\SimpleUpdateChecker\**\*.bsml" Link="SimpleUpdateChecker\%(RecursiveDir)%(FileName)%(Extension)" />
+    <Compile Include="..\SimpleUpdateChecker\**\*.cs" Link="%(RecursiveDir)%(FileName)%(Extension)" />
+    <EmbeddedResource Include="..\SimpleUpdateChecker\**\*.bsml" Link="%(RecursiveDir)%(FileName)%(Extension)" />
     <Compile Remove="..\SimpleUpdateChecker\obj\**\*;..\SimpleUpdateChecker\**\obj\**\*" />
     <Compile Remove="..\SimpleUpdateChecker\**\AssemblyInfo.cs" />
   </ItemGroup>

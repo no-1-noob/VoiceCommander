@@ -13,7 +13,7 @@ namespace VoiceCommander.UI
         protected override void DidActivate(bool firstActivation, bool addedToHierarchy, bool screenSystemEnabling)
         {
             instance = this;
-            SetTitle("VoiceCommander");
+            SetTitle("Voice Commander");
             showBackButton = true;
             settingsLeftView = BeatSaberUI.CreateViewController<SettingsLeftViewController>();
             settingsMidView = BeatSaberUI.CreateViewController<SettingsMidViewController>();

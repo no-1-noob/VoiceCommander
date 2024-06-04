@@ -1,6 +1,7 @@
 ﻿using SiraUtil.Zenject;
 using System.Collections.Generic;
 using System.Linq;
+using VoiceCommander.FeatureDefinition;
 using VoiceCommander.Mgr;
 using Zenject;
 
@@ -8,28 +9,28 @@ namespace VoiceCommander.Installers
 {
     internal class VoiceCommandInstaller : Installer
     {
-        List<VoiceCommandSettings> voiceCommandsToInstall;
+        List<VoiceCommandFeatureSettings> voiceCommandFeaturesToInstall;
+        Location _intallLocation;
 
-        public VoiceCommandInstaller(Location intallLocation)
+        public VoiceCommandInstaller(Location installLocation)
         {
-            this.voiceCommandsToInstall = Plugin.AvailableVoiceCommandSettings.Where(x => (x.ZenjectLocationEnum.HasFlag(intallLocation))).ToList();
+            _intallLocation = installLocation;
+            this.voiceCommandFeaturesToInstall = Plugin.AvailableVoiceCommandFeatureSettings.Where(x => (x.ZenjectLocationEnum.HasFlag(installLocation))).ToList();
         }
         public override void InstallBindings()
         {
-            if(voiceCommandsToInstall?.Count > 0)
+            if(voiceCommandFeaturesToInstall?.Count > 0)
             {
                 CreateVoiceCommandHandler();
-                Container.BindInterfacesAndSelfTo<CoreMgr>().AsSingle().NonLazy();
+                Container.BindInterfacesAndSelfTo<CoreMgr>().AsSingle().WithArguments(_intallLocation).NonLazy();
             }
         }
 
         private void CreateVoiceCommandHandler()
         {
-            foreach (VoiceCommandSettings voiceCommand in voiceCommandsToInstall)
+            foreach (VoiceCommandFeatureSettings featureSetting in voiceCommandFeaturesToInstall)
             {
-
-                Plugin.Log.Error($"Loading voice command {voiceCommand.Name} {voiceCommand.CommandType} {voiceCommand.CommandType?.BaseType?.FullName}...");
-                Container.BindInterfacesAndSelfTo(voiceCommand.CommandType).AsSingle().NonLazy();
+                Container.BindInterfacesAndSelfTo(featureSetting.CommandType).AsSingle().NonLazy();
             }
         }
     }
