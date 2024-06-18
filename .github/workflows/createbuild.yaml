@@ -134,6 +134,8 @@ jobs:
             with:
              name: ${{env.Build_1_29_ArtifactName}}
              path: ${{env.Build_1_29_ArtifactName}}
+          - id: print
+            run: ls -R
           - name: Upload Release Asset 1_29
             if: startsWith(github.ref, 'refs/tags/')
             env:
