@@ -144,6 +144,10 @@ jobs:
             with:
              name: ${{ needs.Build_1_29.outputs.name }}
              path: ${{ needs.Build_1_29.outputs.name }}
+          - uses: actions/download-artifact@master
+            with:
+             name: ${{ needs.Build_1_35.outputs.name }}
+             path: ${{ needs.Build_1_35.outputs.name }}
           - id: print
             run: ls -R
           - uses: montudor/action-zip@v1
