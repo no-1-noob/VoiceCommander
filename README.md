@@ -11,6 +11,9 @@ Download the mod from the release page, put the contents in the plugin folder (i
 ### Performance
 Continuous speech recognition is not light on CPU power. On slower CPUs you may experience some slowdown (e.g. on a 10900k it uses ~9% of the CPU).
 
+### Language
+This mod was develope with english in mind. It uses the voice recoginiton of your Windows install, so make sure to use english windows for the best results.
+
 ### Why is there a commandline window while playing and a random .exe in the VCR folder?
 The built in voice recognition of Unity only works on Win10 and also sometimes does not resume to work after the game has been paused using SteamVR. So this small exe starts a programm, that handles the voice recognition and the plugin running in BeatSaber can attach itself to this programm.
 

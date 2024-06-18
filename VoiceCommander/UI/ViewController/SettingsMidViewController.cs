@@ -19,6 +19,7 @@ namespace VoiceCommander.UI.ViewController
         private List<object> _lsSettingCommand = new List<object>() { };
         private string _currentMod = string.Empty;
         private VoiceCommand _currentCommand = new VoiceCommand();
+        private bool _modsInstalled = false;
 
         public SettingsMidViewController()
         {
@@ -27,7 +28,26 @@ namespace VoiceCommander.UI.ViewController
             {
                 _dctMod[mod.Key] = mod.Select(x => x).ToList();
             }
-            CurrentMod = _dctMod.FirstOrDefault().Key;
+            if(_dctMod.Count > 0)
+            {
+                CurrentMod = _dctMod.FirstOrDefault().Key;
+                ModsInstalled = true;
+            }
+            else
+            {
+                ModsInstalled = false;
+            }
+        }
+
+        [UIValue("modsInstalled")]
+        public bool ModsInstalled
+        {
+            get => _modsInstalled;
+            set
+            {
+                _modsInstalled = value;
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(ModsInstalled)));
+            }
         }
 
         [UIValue("all-mod-options")]
