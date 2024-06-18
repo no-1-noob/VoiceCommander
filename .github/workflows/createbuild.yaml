@@ -2,13 +2,13 @@ name: Build
 
 on:
     push:
-        branches: [master]
+        branches: [master, CI_Multi]
         tags: v*
     pull_request:
         branches: [master]
 
 jobs:
-    Build:
+    Build_1_29:
         runs-on: windows-latest
         steps:
             - uses: actions/checkout@v3
@@ -58,12 +58,104 @@ jobs:
               with:
                   name: ${{ env.filename }}
                   path: ${{ env.artifactpath }}
-            #- name: List files
-            #  run: Get-ChildItem -Path ./ -Recurse
-            #  shell: pwsh
-            - name: Upload Release Asset
-              if: startsWith(github.ref, 'refs/tags/')
+            - id: outPutName
+              run: echo "Name=${{ steps.Build_1_29.outputs.filename }}" >> "$GITHUB_OUTPUT"
+            - id: outPutPath
+              run: echo "Path=${{ steps.Build_1_29.outputs.artifactpath }}" >> "$GITHUB_OUTPUT"
+
+    Build_1_34:
+        runs-on: windows-latest
+        steps:
+            - uses: actions/checkout@v3
+              with:
+                  ref: '1_34'
+                  submodules: recursive
+            - name: Add msbuild to PATH
+              uses: microsoft/setup-msbuild@v2
+            - name: Setup Nuget
+              uses: Nuget/setup-nuget@v1.0.5
+
+            - name: Restore nuget packages
+              run: nuget restore ${{ github.workspace }}/VoiceCommander.sln
+            - name: Initialize modding environment
+              uses: beat-forge/init-beatsaber@v1.1.0
+              with:
+                  token: ${{ github.token }}
+                  version: 1.29.0
+            - name: Download Mod Dependencies
+              uses: Goobwabber/download-beatmods-deps@1.2
+              with:
+                  manifest: ${{ github.workspace }}/VoiceCommander/manifest.json
+            - name: Build
+              id: Build
+              run: msbuild ${{ github.workspace }}/VoiceCommander.sln /property:Configuration=Release
+            - name: GitStatus
+              run: git status
+            - name: Read variables from file and set outputs
+              id: set-outputs
+              shell: pwsh
+              run: |
+                $content = Get-Content -Path ${{ github.workspace }}/VoiceCommander/build_output.txt
+                foreach ($line in $content -split ';') {
+                  $kvp = $line -split '='
+                  $key = $kvp[0]
+                  $value = $kvp[1]
+                  Write-Output ("$key=$value") >> $env:GITHUB_ENV
+                  Write-Output ("$key=$value") >> $env:GITHUB_OUTPUT
+                }
+            - name: Echo Filename
+              run: echo $BUILDTEXT $ASSEMBLYNAME $ARTIFACTPATH
               env:
-                  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-              run:
-                  gh release upload ${{ github.ref_name }} D:/a/VoiceCommander/VoiceCommander/VoiceCommander/bin/Release/zip/${{ env.filename }}.zip
+                  BUILDTEXT: Filename=${{ env.filename }}
+                  ASSEMBLYNAME: AssemblyName=${{ env.assemblyname }}
+                  ARTIFACTPATH: ArtifactPath=${{ env.artifactpath }}
+            - name: Upload Artifact
+              uses: actions/upload-artifact@v4
+              with:
+                  name: ${{ env.filename }}
+                  path: ${{ env.artifactpath }}
+            - id: outPutName
+              run: echo "Name=${{ steps.Build_1_34.outputs.filename }}" >> "$GITHUB_OUTPUT"
+            - id: outPutPath
+              run: echo "Path=${{ steps.Build_1_34.outputs.artifactpath }}" >> "$GITHUB_OUTPUT"
+
+    start:
+        name: Start
+        needs: [Build_1_29, Build_1_34]
+        runs-on: ubuntu-latest
+        env:
+              Build_1_29_ArtifactName: ${{ needs.Build_1_29.outputs.artifactName }}
+              Build_1_34_ArtifactName: ${{ needs.Build_1_34.outputs.artifactName }}
+        steps:
+          - run: echo $Build_1_29_ArtifactName
+          - run: echo $Build_1_34_ArtifactName
+          - uses: actions/download-artifact@master
+            with:
+             name: ${{env.Build_1_29_ArtifactName}}
+             path: ${{env.Build_1_29_ArtifactName}}
+          - uses: montudor/action-zip@v1
+            with:
+                args: zip -qq -r ${{env.Build_1_29_ArtifactName}}.zip ${{env.Build_1_29_ArtifactName}}/Plugins
+          - uses: actions/download-artifact@master
+            with:
+             name: ${{env.Build_1_34_ArtifactName}}
+             path: ${{env.Build_1_34_ArtifactName}}
+          - uses: montudor/action-zip@v1
+            with:
+                args: zip -qq -r ${{env.Build_1_34_ArtifactName}}.zip ${{env.Build_1_34_ArtifactName}}/Plugins
+          - id: print
+            run: ls -l /home/runner/work/PPPredictor/PPPredictor
+          - id: print2
+            run: ls -R
+          - name: Upload Release Asset 1_29
+            if: startsWith(github.ref, 'refs/tags/')
+            env:
+                GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+            run:
+                gh release upload ${{ github.ref_name }} ${{env.Build_1_29_ArtifactName}}.zip
+          - name: Upload Release Asset 1_34
+            if: startsWith(github.ref, 'refs/tags/')
+            env:
+                GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+            run:
+                gh release upload ${{ github.ref_name }} ${{env.Build_1_34_ArtifactName}}.zip
