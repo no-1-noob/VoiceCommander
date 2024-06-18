@@ -63,9 +63,9 @@ jobs:
                   name: ${{ env.filename }}
                   path: ${{ env.artifactpath }}
             - id: outPutName
-              run: echo "name=${{ env.filename }}" >> "$GITHUB_OUTPUT"
+              run: echo "name=${{ env.filename }}" >> $GITHUB_OUTPUT
             - id: outPutPath
-              run: echo "path=${{ env.artifactpath }}" >> "$GITHUB_OUTPUT"
+              run: echo "path=${{ env.artifactpath }}" >> $GITHUB_OUTPUT
 
     Build_1_35:
         runs-on: windows-latest
@@ -122,9 +122,9 @@ jobs:
                   name: ${{ env.filename }}
                   path: ${{ env.artifactpath }}
             - id: outPutName
-              run: echo "name=${{ env.filename }}" >> "$GITHUB_OUTPUT"
+              run: echo "name=${{ env.filename }}" >> $GITHUB_OUTPUT
             - id: outPutPath
-              run: echo "path=${{ env.artifactpath }}" >> "$GITHUB_OUTPUT"
+              run: echo "path=${{ env.artifactpath }}" >> $GITHUB_OUTPUT
 
     Release:
         name: Release
