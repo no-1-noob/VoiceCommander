@@ -11,6 +11,9 @@ Download the mod from the release page, put the contents in the plugin folder (i
 ### Performance
 Continuous speech recognition is not light on CPU power. On slower CPUs you may experience some slowdown (e.g. on a 10900k it uses ~9% of the CPU).
 
+### Microphone
+Make sure that your HMD microphone is the default mic in windows.
+
 ### Language
 This mod was develope with english in mind. It uses the voice recoginiton of your Windows install, so make sure to use english windows for the best results.
 
