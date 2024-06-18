@@ -60,9 +60,9 @@ jobs:
                   name: ${{ env.filename }}
                   path: ${{ env.artifactpath }}
             - id: outPutName
-              run: echo "Name=${{ steps.Build_1_29.outputs.filename }}" >> "$GITHUB_OUTPUT"
+              run: echo "Name=${{ env.filename }}" >> "$GITHUB_OUTPUT"
             - id: outPutPath
-              run: echo "Path=${{ steps.Build_1_29.outputs.artifactpath }}" >> "$GITHUB_OUTPUT"
+              run: echo "Path=${{ env.artifactpath }}" >> "$GITHUB_OUTPUT"
 
     Build_1_35:
         runs-on: windows-latest
@@ -116,17 +116,17 @@ jobs:
                   name: ${{ env.filename }}
                   path: ${{ env.artifactpath }}
             - id: outPutName
-              run: echo "Name=${{ steps.Build_1_35.outputs.filename }}" >> "$GITHUB_OUTPUT"
+              run: echo "Name=${{ env.filename }}" >> "$GITHUB_OUTPUT"
             - id: outPutPath
-              run: echo "Path=${{ steps.Build_1_35.outputs.artifactpath }}" >> "$GITHUB_OUTPUT"
+              run: echo "Path=${{ env.artifactpath }}" >> "$GITHUB_OUTPUT"
 
     Release:
         name: Release
         needs: [Build_1_29, Build_1_35]
         runs-on: ubuntu-latest
         env:
-              Build_1_29_ArtifactName: ${{ needs.Build_1_29.outputs.artifactName }}
-              Build_1_35_ArtifactName: ${{ needs.Build_1_35.outputs.artifactName }}
+              Build_1_29_ArtifactName: ${{ needs.Build_1_29.outputs.Name }}
+              Build_1_35_ArtifactName: ${{ needs.Build_1_35.outputs.Name }}
         steps:
           - run: echo ${{env.Build_1_29_ArtifactName}}
           - run: echo ${{env.Build_1_35_ArtifactName}}
