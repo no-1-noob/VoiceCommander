@@ -128,26 +128,12 @@ jobs:
               Build_1_29_ArtifactName: ${{ needs.Build_1_29.outputs.artifactName }}
               Build_1_35_ArtifactName: ${{ needs.Build_1_35.outputs.artifactName }}
         steps:
-          - run: echo $Build_1_29_ArtifactName
-          - run: echo $Build_1_35_ArtifactName
+          - run: echo ${{env.Build_1_29_ArtifactName}}
+          - run: echo ${{env.Build_1_35_ArtifactName}}
           - uses: actions/download-artifact@master
             with:
              name: ${{env.Build_1_29_ArtifactName}}
              path: ${{env.Build_1_29_ArtifactName}}
-          - uses: montudor/action-zip@v1
-            with:
-                args: zip -qq -r ${{env.Build_1_29_ArtifactName}}.zip ${{env.Build_1_29_ArtifactName}}/Plugins
-          - uses: actions/download-artifact@master
-            with:
-             name: ${{env.Build_1_35_ArtifactName}}
-             path: ${{env.Build_1_35_ArtifactName}}
-          - uses: montudor/action-zip@v1
-            with:
-                args: zip -qq -r ${{env.Build_1_35_ArtifactName}}.zip ${{env.Build_1_35_ArtifactName}}/Plugins
-          - id: print
-            run: ls -l /home/runner/work/PPPredictor/PPPredictor
-          - id: print2
-            run: ls -R
           - name: Upload Release Asset 1_29
             if: startsWith(github.ref, 'refs/tags/')
             env:
