@@ -134,29 +134,29 @@ jobs:
               Build_1_29_ArtifactName: ${{ needs.Build_1_29.outputs.name }}
               Build_1_35_ArtifactName: ${{ needs.Build_1_35.outputs.name }}
         steps:
-          - run: echo ${{env.Build_1_29_ArtifactName}}
-          - run: echo ${{env.Build_1_35_ArtifactName}}
+          - run: echo ${{ needs.Build_1_29.outputs.name }}
+          - run: echo ${{ needs.Build_1_35.outputs.name }}
           - uses: actions/download-artifact@master
             with:
-             name: ${{env.Build_1_29_ArtifactName}}
-             path: ${{env.Build_1_29_ArtifactName}}
+             name: ${{ needs.Build_1_29.outputs.name }}
+             path: ${{ needs.Build_1_29.outputs.name }}
           - id: print
             run: ls -R
           - uses: montudor/action-zip@v1
             with:
-                args: zip -qq -r ${{env.Build_1_29_ArtifactName}}.zip ${{env.Build_1_29_ArtifactName}}/Plugins
+                args: zip -qq -r ${{ needs.Build_1_29.outputs.name }}.zip ${{ needs.Build_1_29.outputs.name }}/Plugins
           - uses: montudor/action-zip@v1
             with:
-                args: zip -qq -r ${{env.Build_1_35_ArtifactName}}.zip ${{env.Build_1_35_ArtifactName}}/Plugins
+                args: zip -qq -r ${{ needs.Build_1_35.outputs.name }}.zip ${{ needs.Build_1_35.outputs.name }}/Plugins
           - name: Upload Release Asset 1_29
             if: startsWith(github.ref, 'refs/tags/')
             env:
                 GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
             run:
-                gh release upload ${{ github.ref_name }} ${{env.Build_1_29_ArtifactName}}.zip
+                gh release upload ${{ github.ref_name }} ${{ needs.Build_1_29.outputs.name }}.zip
           - name: Upload Release Asset 1_35
             if: startsWith(github.ref, 'refs/tags/')
             env:
                 GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
             run:
-                gh release upload ${{ github.ref_name }} ${{env.Build_1_35_ArtifactName}}.zip
+                gh release upload ${{ github.ref_name }} ${{ needs.Build_1_35.outputs.name }}.zip
