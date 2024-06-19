@@ -10,9 +10,6 @@ on:
 jobs:
     Build_1_29:
         runs-on: windows-latest
-        outputs:
-            name: ${{ steps.outPutName.outputs.name }}
-            path: ${{ steps.outPutPath.outputs.path }}
         steps:
             - uses: actions/checkout@v3
               with:
@@ -62,18 +59,15 @@ jobs:
               with:
                   name: ${{ env.filename }}
                   path: ${{ env.artifactpath }}
-            - id: outPutName
-              shell: bash
-              run: echo "name=${{ env.filename }}" >> $GITHUB_OUTPUT
-            - id: outPutPath
-              shell: bash
-              run: echo "path=${{ env.artifactpath }}" >> $GITHUB_OUTPUT
+            - name: Upload Release Asset
+              if: startsWith(github.ref, 'refs/tags/')
+              env:
+                  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+              run:
+                  gh release upload ${{ github.ref_name }} D:/a/VoiceCommander/VoiceCommander/VoiceCommander/bin/Release/zip/${{ env.filename }}.zip
 
     Build_1_35:
         runs-on: windows-latest
-        outputs:
-            name: ${{ steps.outPutName.outputs.name }}
-            path: ${{ steps.outPutPath.outputs.path }}
         steps:
             - uses: actions/checkout@v3
               with:
@@ -123,48 +117,9 @@ jobs:
               with:
                   name: ${{ env.filename }}
                   path: ${{ env.artifactpath }}
-            - id: outPutName
-              shell: bash
-              run: echo "name=${{ env.filename }}" >> $GITHUB_OUTPUT
-            - id: outPutPath
-              shell: bash
-              run: echo "path=${{ env.artifactpath }}" >> $GITHUB_OUTPUT
-
-    Release:
-        name: Release
-        needs: [Build_1_29, Build_1_35]
-        runs-on: ubuntu-latest
-        env:
-              Build_1_29_ArtifactName: ${{ needs.Build_1_29.outputs.name }}
-              Build_1_35_ArtifactName: ${{ needs.Build_1_35.outputs.name }}
-        steps:
-          - run: echo ${{ needs.Build_1_29.outputs.name }}
-          - run: echo ${{ needs.Build_1_35.outputs.name }}
-          - uses: actions/download-artifact@master
-            with:
-             name: ${{ needs.Build_1_29.outputs.name }}
-             path: ${{ needs.Build_1_29.outputs.name }}
-          - uses: actions/download-artifact@master
-            with:
-             name: ${{ needs.Build_1_35.outputs.name }}
-             path: ${{ needs.Build_1_35.outputs.name }}
-          - id: print
-            run: ls -R
-          - uses: montudor/action-zip@v1
-            with:
-                args: zip -qq -r ${{ needs.Build_1_29.outputs.name }}.zip ${{ needs.Build_1_29.outputs.name }}/Plugins
-          - uses: montudor/action-zip@v1
-            with:
-                args: zip -qq -r ${{ needs.Build_1_35.outputs.name }}.zip ${{ needs.Build_1_35.outputs.name }}/Plugins
-          - name: Upload Release Asset 1_29
-            if: startsWith(github.ref, 'refs/tags/')
-            env:
-                GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-            run:
-                gh release upload ${{ github.ref_name }} ${{ needs.Build_1_29.outputs.name }}.zip
-          - name: Upload Release Asset 1_35
-            if: startsWith(github.ref, 'refs/tags/')
-            env:
-                GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-            run:
-                gh release upload ${{ github.ref_name }} ${{ needs.Build_1_35.outputs.name }}.zip
+            - name: Upload Release Asset
+              if: startsWith(github.ref, 'refs/tags/')
+              env:
+                  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+              run:
+                  gh release upload ${{ github.ref_name }} D:/a/VoiceCommander/VoiceCommander/VoiceCommander/bin/Release/zip/${{ env.filename }}.zip
