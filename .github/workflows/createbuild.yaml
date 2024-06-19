@@ -2,7 +2,7 @@ name: Build
 
 on:
     push:
-        branches: [master, CI_Multi]
+        branches: [master]
         tags: v*
     pull_request:
         branches: [master]
