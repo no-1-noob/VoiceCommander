@@ -40,7 +40,7 @@ namespace VoiceCommander
         [Init]
         public void Init(IPALogger logger, Zenjector zenjector, IPA.Config.Config conf)
         {
-            base.CreateSimpleUpdateChecker(logger, zenjector, "https://mods.no1noob.net/api/VoiceCommander_1_29", "https://github.com/no-1-noob/VoiceCommander/releases");
+            base.CreateSimpleUpdateChecker(logger, zenjector, "https://mods.no1noob.net/api/VoiceCommander_1_35", "https://github.com/no-1-noob/VoiceCommander/releases");
             Instance = this;
             if(conf != null)
             {
