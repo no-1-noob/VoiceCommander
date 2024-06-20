@@ -76,7 +76,7 @@ namespace VoiceCommander.UI.ViewController
                     _currentCommand = lsVoiceCommands.FirstOrDefault();
                     PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(CurrentMod)));
                     PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(AllCommandOptions)));
-                    RefreshSelectedCommand();
+                    RefreshSelectedCommand(true);
                 }
             }
         }
